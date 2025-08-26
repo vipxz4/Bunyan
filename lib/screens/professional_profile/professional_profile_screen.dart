@@ -273,7 +273,7 @@ class ProfessionalProfileScreen extends ConsumerWidget {
             flex: 1,
             child: OutlinedButton(
               child: const Text('تواصل'),
-              onPressed: () {},
+              onPressed: () => context.push('/home/chat/chat_professional_1'),
             ),
           ),
           const SizedBox(width: 12),

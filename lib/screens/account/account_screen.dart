@@ -40,7 +40,9 @@ class AccountScreen extends ConsumerWidget {
                         text: 'العقود المحفوظة',
                         onTap: () {}),
                     _AccountMenuItem(
-                        icon: LucideIcons.heart, text: 'المفضلة', onTap: () {}),
+                        icon: LucideIcons.heart,
+                        text: 'المفضلة',
+                        onTap: () => context.push('/home/favorites')),
                     _AccountMenuItem(
                         icon: LucideIcons.star, text: 'تقييماتي', onTap: () {}),
                   ]),

@@ -134,7 +134,9 @@ class HomeScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _QuickAccessButton(
-                  icon: LucideIcons.shoppingCart, label: 'سلة التسوق', onTap: () {}),
+                  icon: LucideIcons.shoppingCart,
+                  label: 'سلة التسوق',
+                  onTap: () => context.push('/home/cart')),
               _QuickAccessButton(
                   icon: LucideIcons.messageSquare,
                   label: 'الرسائل',
@@ -157,7 +159,7 @@ class HomeScreen extends ConsumerWidget {
           child: _SearchCard(
             title: 'ابحث عن مهني',
             imageUrl: 'https://images.unsplash.com/photo-1599305445671-ac291c9a87bb?q=80&w=1770&auto=format&fit=crop',
-            onTap: () {},
+            onTap: () => context.push('/home/professional-search'),
           ),
         ),
         const SizedBox(width: 16),
@@ -165,7 +167,7 @@ class HomeScreen extends ConsumerWidget {
           child: _SearchCard(
             title: 'ابحث عن مواد',
             imageUrl: 'https://images.unsplash.com/photo-1563461660-63166996d910?q=80&w=1887&auto=format&fit=crop',
-            onTap: () {},
+            onTap: () => context.push('/home/materials-search'),
           ),
         ),
       ],

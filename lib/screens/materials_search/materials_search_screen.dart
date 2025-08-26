@@ -66,12 +66,36 @@ class MaterialsSearchScreen extends ConsumerWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _CategoryCard(icon: LucideIcons.gem, label: 'إسمنت ورمل', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.truck, label: 'طوب وبلك', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.blinds, label: 'أخشاب', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.hammer, label: 'حديد', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.paintBucket, label: 'دهانات', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.pill, label: 'أدوات', onTap: () {}),
+                  _CategoryCard(
+                      icon: LucideIcons.gem,
+                      label: 'إسمنت ورمل',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.truck,
+                      label: 'طوب وبلك',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.blinds,
+                      label: 'أخشاب',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.hammer,
+                      label: 'حديد',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.paintBucket,
+                      label: 'دهانات',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.pill,
+                      label: 'أدوات',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
                 ],
               ),
             ),
