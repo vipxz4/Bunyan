@@ -138,10 +138,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
             const SizedBox(height: 20),
             PrimaryButton(
               text: 'إنشاء حساب',
-              onPressed: () {
-                // TODO: Navigate to OTP screen
-                // context.push('/otp');
-              },
+              onPressed: () => context.push('/otp'),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('لديك حساب بالفعل؟', style: textTheme.bodyMedium),
+                TextButton(
+                  onPressed: () => context.go('/login'),
+                  child: const Text('تسجيل الدخول'),
+                ),
+              ],
             ),
           ],
         ),

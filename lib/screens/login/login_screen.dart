@@ -58,10 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: TextButton(
-                  onPressed: () {
-                    // TODO: Navigate to forgot password screen
-                    // context.push('/forgot-password');
-                  },
+                  onPressed: () => context.push('/forgot-password'),
                   child: const Text('نسيت كلمة المرور؟'),
                 ),
               ),
@@ -77,10 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Text('ليس لديك حساب؟', style: textTheme.bodyMedium),
                   TextButton(
-                    onPressed: () {
-                      // TODO: Navigate to register screen
-                      // context.push('/register');
-                    },
+                    onPressed: () => context.push('/register'),
                     child: const Text('إنشاء حساب'),
                   ),
                 ],

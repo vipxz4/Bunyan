@@ -3,6 +3,8 @@ import 'package:bonyan/screens/home/home_screen.dart';
 import 'package:bonyan/screens/login/login_screen.dart';
 import 'package:bonyan/screens/my_projects_list/my_projects_list_screen.dart';
 import 'package:bonyan/screens/onboarding/onboarding_screen.dart';
+import 'package:bonyan/screens/otp/otp_screen.dart';
+import 'package:bonyan/screens/register/register_screen.dart';
 import 'package:bonyan/screens/materials_search/materials_search_screen.dart';
 import 'package:bonyan/screens/materials_search_results/materials_search_results_screen.dart';
 import 'package:bonyan/screens/product_details/product_details_screen.dart';
@@ -13,10 +15,12 @@ import 'package:bonyan/screens/cart/cart_screen.dart';
 import 'package:bonyan/screens/checkout_summary/checkout_summary_screen.dart';
 import 'package:bonyan/screens/chat_interface/chat_interface_screen.dart';
 import 'package:bonyan/screens/chat_list/chat_list_screen.dart';
+import 'package:bonyan/screens/coming_soon/coming_soon_screen.dart';
 import 'package:bonyan/screens/edit_profile/edit_profile_screen.dart';
 import 'package:bonyan/screens/favorites/favorites_screen.dart';
 import 'package:bonyan/screens/notification_details/notification_details_screen.dart';
 import 'package:bonyan/screens/notifications/notifications_screen.dart';
+import 'package:bonyan/screens/forgot_password/forgot_password_screen.dart';
 import 'package:bonyan/screens/splash/splash_screen.dart';
 import 'package:bonyan/screens/supplier_profile/supplier_profile_screen.dart';
 import 'package:bonyan/widgets/navigation/scaffold_with_nav_bar.dart';
@@ -48,6 +52,21 @@ final goRouter = GoRouter(
       path: '/login',
       name: 'login',
       builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/register',
+      name: 'register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/forgot-password',
+      name: 'forgot-password',
+      builder: (context, state) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: '/otp',
+      name: 'otp',
+      builder: (context, state) => const OTPScreen(),
     ),
     // Main application shell
     StatefulShellRoute.indexedStack(
@@ -177,6 +196,11 @@ final goRouter = GoRouter(
                   path: 'edit-profile',
                   name: 'edit-profile',
                   builder: (context, state) => const EditProfileScreen(),
+                ),
+                GoRoute(
+                  path: 'coming-soon',
+                  name: 'coming-soon',
+                  builder: (context, state) => const ComingSoonScreen(),
                 ),
               ],
             ),

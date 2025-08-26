@@ -30,35 +30,47 @@ class AccountScreen extends ConsumerWidget {
                     _AccountMenuItem(
                         icon: LucideIcons.shoppingBag,
                         text: 'طلبات الشراء',
-                        onTap: () {}),
+                        onTap: () => context.push('/account/coming-soon')),
                     _AccountMenuItem(
                         icon: LucideIcons.mailQuestion,
                         text: 'طلبات عروض الأسعار',
-                        onTap: () {}),
+                        onTap: () => context.push('/account/coming-soon')),
                     _AccountMenuItem(
                         icon: LucideIcons.fileCheck2,
                         text: 'العقود المحفوظة',
-                        onTap: () {}),
+                        onTap: () => context.push('/account/coming-soon')),
                     _AccountMenuItem(
                         icon: LucideIcons.heart,
                         text: 'المفضلة',
                         onTap: () => context.push('/home/favorites')),
                     _AccountMenuItem(
-                        icon: LucideIcons.star, text: 'تقييماتي', onTap: () {}),
+                        icon: LucideIcons.star,
+                        text: 'تقييماتي',
+                        onTap: () => context.push('/account/coming-soon')),
                   ]),
                   const SizedBox(height: 16),
                   _buildMenuSection([
                     _AccountMenuItem(
-                        icon: LucideIcons.settings, text: 'الإعدادات', onTap: () {}),
+                        icon: LucideIcons.settings,
+                        text: 'الإعدادات',
+                        onTap: () => context.push('/account/coming-soon')),
                     _AccountMenuItem(
                         icon: LucideIcons.helpCircle,
                         text: 'المساعدة والدعم',
-                        onTap: () {}),
+                        onTap: () => context.push('/account/coming-soon')),
                   ]),
                   const SizedBox(height: 16),
-                   _buildMenuSection([
-                     _AccountMenuItem(icon: LucideIcons.briefcase, text: 'لوحة تحكم مقدم الخدمة', color: Colors.green.shade700, onTap: () {}),
-                     _AccountMenuItem(icon: LucideIcons.store, text: 'لوحة تحكم المورد', color: Colors.blue.shade700, onTap: () {}),
+                  _buildMenuSection([
+                    _AccountMenuItem(
+                        icon: LucideIcons.briefcase,
+                        text: 'لوحة تحكم مقدم الخدمة',
+                        color: Colors.green.shade700,
+                        onTap: () => context.push('/account/coming-soon')),
+                    _AccountMenuItem(
+                        icon: LucideIcons.store,
+                        text: 'لوحة تحكم المورد',
+                        color: Colors.blue.shade700,
+                        onTap: () => context.push('/account/coming-soon')),
                   ]),
                   const SizedBox(height: 16),
                   SizedBox(
