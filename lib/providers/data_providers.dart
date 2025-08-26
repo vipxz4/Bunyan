@@ -23,19 +23,19 @@ final myReviewsProvider = Provider<List<ReviewModel>>((ref) => mockMyReviews);
 // --- Family Providers for Details ---
 
 final professionalDetailsProvider =
-    Provider.family<ProfessionalModel?, String>((ref, id) {
+    FutureProvider.family<ProfessionalModel?, String>((ref, id) async {
   return mockRecommendedProfessionals.firstWhereOrNull((p) => p.id == id);
 });
 
 final supplierDetailsProvider =
-    Provider.family<SupplierModel?, String>((ref, id) {
+    FutureProvider.family<SupplierModel?, String>((ref, id) async {
   // For now, we only have one mock supplier.
   if (id == mockSupplier.id) return mockSupplier;
   return null;
 });
 
 final productDetailsProvider =
-    Provider.family<ProductModel?, String>((ref, id) {
+    FutureProvider.family<ProductModel?, String>((ref, id) async {
   return mockProducts.firstWhereOrNull((p) => p.id == id);
 });
 
