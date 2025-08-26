@@ -20,6 +20,9 @@ import 'package:bonyan/screens/edit_profile/edit_profile_screen.dart';
 import 'package:bonyan/screens/favorites/favorites_screen.dart';
 import 'package:bonyan/screens/notification_details/notification_details_screen.dart';
 import 'package:bonyan/screens/notifications/notifications_screen.dart';
+import 'package:bonyan/screens/purchase_orders/purchase_orders_screen.dart';
+import 'package:bonyan/screens/quotation_requests/quotation_requests_screen.dart';
+import 'package:bonyan/screens/saved_contracts/saved_contracts_screen.dart';
 import 'package:bonyan/screens/forgot_password/forgot_password_screen.dart';
 import 'package:bonyan/screens/splash/splash_screen.dart';
 import 'package:bonyan/screens/supplier_profile/supplier_profile_screen.dart';
@@ -201,6 +204,21 @@ final goRouter = GoRouter(
                   path: 'coming-soon',
                   name: 'coming-soon',
                   builder: (context, state) => const ComingSoonScreen(),
+                ),
+                GoRoute(
+                  path: 'purchase-orders',
+                  name: 'purchase-orders',
+                  builder: (context, state) => const PurchaseOrdersScreen(),
+                ),
+                GoRoute(
+                  path: 'quotation-requests',
+                  name: 'quotation-requests',
+                  builder: (context, state) => const QuotationRequestsScreen(),
+                ),
+                GoRoute(
+                  path: 'saved-contracts',
+                  name: 'saved-contracts',
+                  builder: (context, state) => const SavedContractsScreen(),
                 ),
               ],
             ),

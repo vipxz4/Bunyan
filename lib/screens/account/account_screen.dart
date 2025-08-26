@@ -30,15 +30,15 @@ class AccountScreen extends ConsumerWidget {
                     _AccountMenuItem(
                         icon: LucideIcons.shoppingBag,
                         text: 'طلبات الشراء',
-                        onTap: () => context.push('/account/coming-soon')),
+                        onTap: () => context.push('/account/purchase-orders')),
                     _AccountMenuItem(
                         icon: LucideIcons.mailQuestion,
                         text: 'طلبات عروض الأسعار',
-                        onTap: () => context.push('/account/coming-soon')),
+                        onTap: () => context.push('/account/quotation-requests')),
                     _AccountMenuItem(
                         icon: LucideIcons.fileCheck2,
                         text: 'العقود المحفوظة',
-                        onTap: () => context.push('/account/coming-soon')),
+                        onTap: () => context.push('/account/saved-contracts')),
                     _AccountMenuItem(
                         icon: LucideIcons.heart,
                         text: 'المفضلة',
