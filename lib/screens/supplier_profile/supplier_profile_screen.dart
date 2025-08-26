@@ -1,7 +1,7 @@
-import 'package:bunyan/core/app_theme.dart';
-import 'package:bunyan/models/models.dart';
-import 'package:bunyan/providers/providers.dart';
-import 'package:bunyan/widgets/widgets.dart';
+import 'package:bonyan/core/app_theme.dart';
+import 'package:bonyan/models/models.dart';
+import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/widgets/widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,49 +17,56 @@ class SupplierProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final supplierAsync = ref.watch(supplierDetailsProvider(id));
     final allProducts = ref.watch(productsProvider);
-    final supplierProducts = allProducts.where((p) => p.supplierId == id).toList();
+    final supplierProducts =
+        allProducts.where((p) => p.supplierId == id).toList();
 
     return supplierAsync.when(
-      data: (supplier) {
-        if (supplier == null) {
-          return const Scaffold(
-            body: Center(child: Text('المورد غير موجود.')),
-          );
-        }
-        return Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              _buildHeader(context, supplier),
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    Transform.translate(
-                      offset: const Offset(0, -40),
-                      child: _buildInfoSection(context, supplier),
+          data: (supplier) {
+            if (supplier == null) {
+              return const Scaffold(
+                body: Center(child: Text('المورد غير موجود.')),
+              );
+            }
+            return Scaffold(
+              body: CustomScrollView(
+                slivers: [
+                  _buildHeader(context, supplier),
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        Transform.translate(
+                          offset: const Offset(0, -40),
+                          child: _buildInfoSection(context, supplier),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildDeliveryPolicySection(context, supplier),
+                              const SizedBox(height: 24),
+                              _buildProductsSection(context, supplierProducts),
+                              const SizedBox(height: 100),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildDeliveryPolicySection(context, supplier),
-                          const SizedBox(height: 24),
-                          _buildProductsSection(context, supplierProducts),
-                          const SizedBox(height: 100),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+              bottomNavigationBar: _buildActionButtons(context),
+            );
+          },
+          loading: () =>
+              const Scaffold(body: Center(child: CircularProgressIndicator())),
+          error: (err, stack) => Scaffold(
+            body: Center(child: Text('حدث خطأ: $err')),
           ),
-          bottomNavigationBar: _buildActionButtons(context),
+        ) ??
+        const Scaffold(
+          body: Center(child: Text('لا توجد بيانات متاحة.')),
         );
-      },
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (error, stack) => Scaffold(body: Center(child: Text('Error: $error'))),
-    );
   }
 
   SliverAppBar _buildHeader(BuildContext context, SupplierModel supplier) {
@@ -95,7 +102,8 @@ class SupplierProfileScreen extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Text(supplier.name, style: textTheme.displaySmall, textAlign: TextAlign.center),
+        Text(supplier.name,
+            style: textTheme.displaySmall, textAlign: TextAlign.center),
         Text(supplier.specialty, style: textTheme.bodyLarge),
         const SizedBox(height: 8),
         Row(
@@ -111,7 +119,8 @@ class SupplierProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDeliveryPolicySection(BuildContext context, SupplierModel supplier) {
+  Widget _buildDeliveryPolicySection(
+      BuildContext context, SupplierModel supplier) {
     final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +132,8 @@ class SupplierProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProductsSection(BuildContext context, List<ProductModel> products) {
+  Widget _buildProductsSection(
+      BuildContext context, List<ProductModel> products) {
     final textTheme = Theme.of(context).textTheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +163,7 @@ class SupplierProfileScreen extends ConsumerWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-     return Container(
+    return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       decoration: BoxDecoration(
         color: AppTheme.surface,
@@ -171,7 +181,7 @@ class SupplierProfileScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 12),
-           Expanded(
+          Expanded(
             flex: 1,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),

@@ -1,25 +1,25 @@
-import 'package:bunyan/screens/account/account_screen.dart';
-import 'package:bunyan/screens/home/home_screen.dart';
-import 'package:bunyan/screens/login/login_screen.dart';
-import 'package:bunyan/screens/my_projects_list/my_projects_list_screen.dart';
-import 'package:bunyan/screens/onboarding/onboarding_screen.dart';
-import 'package:bunyan/screens/materials_search/materials_search_screen.dart';
-import 'package:bunyan/screens/materials_search_results/materials_search_results_screen.dart';
-import 'package:bunyan/screens/product_details/product_details_screen.dart';
-import 'package:bunyan/screens/professional_profile/professional_profile_screen.dart';
-import 'package:bunyan/screens/professional_search/professional_search_screen.dart';
-import 'package:bunyan/screens/professional_search_results/professional_search_results_screen.dart';
-import 'package:bunyan/screens/cart/cart_screen.dart';
-import 'package:bunyan/screens/checkout_summary/checkout_summary_screen.dart';
-import 'package:bunyan/screens/chat_interface/chat_interface_screen.dart';
-import 'package:bunyan/screens/chat_list/chat_list_screen.dart';
-import 'package:bunyan/screens/edit_profile/edit_profile_screen.dart';
-import 'package:bunyan/screens/favorites/favorites_screen.dart';
-import 'package:bunyan/screens/notification_details/notification_details_screen.dart';
-import 'package:bunyan/screens/notifications/notifications_screen.dart';
-import 'package:bunyan/screens/splash/splash_screen.dart';
-import 'package:bunyan/screens/supplier_profile/supplier_profile_screen.dart';
-import 'package:bunyan/widgets/navigation/scaffold_with_nav_bar.dart';
+import 'package:bonyan/screens/account/account_screen.dart';
+import 'package:bonyan/screens/home/home_screen.dart';
+import 'package:bonyan/screens/login/login_screen.dart';
+import 'package:bonyan/screens/my_projects_list/my_projects_list_screen.dart';
+import 'package:bonyan/screens/onboarding/onboarding_screen.dart';
+import 'package:bonyan/screens/materials_search/materials_search_screen.dart';
+import 'package:bonyan/screens/materials_search_results/materials_search_results_screen.dart';
+import 'package:bonyan/screens/product_details/product_details_screen.dart';
+import 'package:bonyan/screens/professional_profile/professional_profile_screen.dart';
+import 'package:bonyan/screens/professional_search/professional_search_screen.dart';
+import 'package:bonyan/screens/professional_search_results/professional_search_results_screen.dart';
+import 'package:bonyan/screens/cart/cart_screen.dart';
+import 'package:bonyan/screens/checkout_summary/checkout_summary_screen.dart';
+import 'package:bonyan/screens/chat_interface/chat_interface_screen.dart';
+import 'package:bonyan/screens/chat_list/chat_list_screen.dart';
+import 'package:bonyan/screens/edit_profile/edit_profile_screen.dart';
+import 'package:bonyan/screens/favorites/favorites_screen.dart';
+import 'package:bonyan/screens/notification_details/notification_details_screen.dart';
+import 'package:bonyan/screens/notifications/notifications_screen.dart';
+import 'package:bonyan/screens/splash/splash_screen.dart';
+import 'package:bonyan/screens/supplier_profile/supplier_profile_screen.dart';
+import 'package:bonyan/widgets/navigation/scaffold_with_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -87,12 +87,14 @@ final goRouter = GoRouter(
                 GoRoute(
                   path: 'professional-search-results',
                   name: 'professional-search-results',
-                  builder: (context, state) => const ProfessionalSearchResultsScreen(),
+                  builder: (context, state) =>
+                      const ProfessionalSearchResultsScreen(),
                 ),
                 GoRoute(
                   path: 'professional-profile/:id',
                   name: 'professional-profile',
-                  builder: (context, state) => ProfessionalProfileScreen(id: state.pathParameters['id']!),
+                  builder: (context, state) => ProfessionalProfileScreen(
+                      id: state.pathParameters['id']!),
                 ),
                 GoRoute(
                   path: 'materials-search',
@@ -102,17 +104,20 @@ final goRouter = GoRouter(
                 GoRoute(
                   path: 'materials-search-results',
                   name: 'materials-search-results',
-                  builder: (context, state) => const MaterialsSearchResultsScreen(),
+                  builder: (context, state) =>
+                      const MaterialsSearchResultsScreen(),
                 ),
                 GoRoute(
                   path: 'product-details/:id',
                   name: 'product-details',
-                  builder: (context, state) => ProductDetailsScreen(id: state.pathParameters['id']!),
+                  builder: (context, state) =>
+                      ProductDetailsScreen(id: state.pathParameters['id']!),
                 ),
                 GoRoute(
                   path: 'supplier-profile/:id',
                   name: 'supplier-profile',
-                  builder: (context, state) => SupplierProfileScreen(id: state.pathParameters['id']!),
+                  builder: (context, state) =>
+                      SupplierProfileScreen(id: state.pathParameters['id']!),
                 ),
                 GoRoute(
                   path: 'cart',

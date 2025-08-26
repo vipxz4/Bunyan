@@ -1,4 +1,4 @@
-import 'package:bunyan/models/product_model.dart';
+import 'package:bonyan/models/product_model.dart';
 import 'package:flutter/foundation.dart';
 
 @immutable

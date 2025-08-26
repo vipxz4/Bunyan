@@ -1,5 +1,5 @@
-import 'package:bunyan/providers/providers.dart';
-import 'package:bunyan/widgets/widgets.dart';
+import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -48,8 +48,8 @@ class ProfessionalSearchScreen extends ConsumerWidget {
                   _CategoryCard(icon: LucideIcons.hardHat, label: 'مقاولون', onTap: () => context.push('/home/professional-search-results')),
                   _CategoryCard(icon: LucideIcons.wrench, label: 'سباكون', onTap: () => context.push('/home/professional-search-results')),
                   _CategoryCard(icon: LucideIcons.plugZap, label: 'كهربائيون', onTap: () => context.push('/home/professional-search-results')),
-                  _CategoryCard(icon: LucideIcons.paintRoller, label: 'نقاشون', onTap: () => context.push('/home/professional-search-results')),
-                  _CategoryCard(icon: LucideIcons.pencilRuler, label: 'مهندسون', onTap: () => context.push('/home/professional-search-results')),
+                  _CategoryCard(icon: LucideIcons.hardHat, label: 'نقاشون', onTap: () => context.push('/home/professional-search-results')),
+                  _CategoryCard(icon: LucideIcons.hardHat, label: 'مهندسون', onTap: () => context.push('/home/professional-search-results')),
                   _CategoryCard(icon: LucideIcons.layoutGrid, label: 'أخرى', onTap: () => context.push('/home/professional-search-results')),
                 ],
               ),

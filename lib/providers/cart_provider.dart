@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bunyan/models/models.dart';
+import 'package:bonyan/models/models.dart';
 
 // 1. The State Notifier for the cart
 class CartNotifier extends StateNotifier<List<CartItemModel>> {

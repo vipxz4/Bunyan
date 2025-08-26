@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bunyan/data/mock_data.dart';
-import 'package:bunyan/models/models.dart';
+import 'package:bonyan/data/mock_data.dart';
+import 'package:bonyan/models/models.dart';
 import 'package:collection/collection.dart';
 
 // --- Single Object Providers ---

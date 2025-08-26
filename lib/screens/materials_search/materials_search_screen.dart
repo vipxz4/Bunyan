@@ -1,6 +1,6 @@
 import 'package:badges/badges.dart' as badges;
-import 'package:bunyan/providers/providers.dart';
-import 'package:bunyan/widgets/widgets.dart';
+import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -67,11 +67,11 @@ class MaterialsSearchScreen extends ConsumerWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   _CategoryCard(icon: LucideIcons.gem, label: 'إسمنت ورمل', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.brick, label: 'طوب وبلك', onTap: () {}),
+                  _CategoryCard(icon: LucideIcons.truck, label: 'طوب وبلك', onTap: () {}),
                   _CategoryCard(icon: LucideIcons.blinds, label: 'أخشاب', onTap: () {}),
                   _CategoryCard(icon: LucideIcons.hammer, label: 'حديد', onTap: () {}),
                   _CategoryCard(icon: LucideIcons.paintBucket, label: 'دهانات', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.drill, label: 'أدوات', onTap: () {}),
+                  _CategoryCard(icon: LucideIcons.pill, label: 'أدوات', onTap: () {}),
                 ],
               ),
             ),

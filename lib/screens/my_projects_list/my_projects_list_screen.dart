@@ -1,5 +1,5 @@
-import 'package:bunyan/providers/providers.dart';
-import 'package:bunyan/widgets/widgets.dart';
+import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

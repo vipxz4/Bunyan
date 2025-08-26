@@ -1,7 +1,8 @@
-import 'package:bunyan/core/app_theme.dart';
-import 'package:bunyan/models/models.dart';
-import 'package:bunyan/providers/providers.dart';
-import 'package:bunyan/widgets/widgets.dart';
+import 'package:bonyan/core/app_theme.dart';
+import 'package:bonyan/models/models.dart';
+import 'package:bonyan/providers/favorites_provider.dart';
+import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/widgets/widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,8 +29,7 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     return productAsync.when(
       data: (product) {
         if (product == null) {
-          return const Scaffold(
-              body: Center(child: Text('المنتج غير موجود.')));
+          return const Scaffold(body: Center(child: Text('المنتج غير موجود.')));
         }
         final textTheme = Theme.of(context).textTheme;
 
@@ -42,14 +42,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                 actions: [
                   Consumer(builder: (context, ref, _) {
                     final isFavorite = ref.watch(favoritesProvider
-                        .select((favs) => favs.productIds.contains(id)));
+                        .select((favs) => favs.productIds.contains(widget.id)));
                     return IconButton(
                       icon: Icon(
                           isFavorite ? LucideIcons.heart : LucideIcons.heart,
                           color: isFavorite ? AppTheme.red : Colors.white),
                       onPressed: () => ref
                           .read(favoritesProvider.notifier)
-                          .toggleProductFavorite(id),
+                          .toggleProductFavorite(widget.id),
                       style:
                           IconButton.styleFrom(backgroundColor: Colors.black26),
                     );
@@ -103,7 +103,8 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildSupplierInfo(BuildContext context, ProductModel product, TextTheme textTheme) {
+  Widget _buildSupplierInfo(
+      BuildContext context, ProductModel product, TextTheme textTheme) {
     return InkWell(
       onTap: () => context.push('/home/supplier-profile/${product.supplierId}'),
       borderRadius: BorderRadius.circular(12),
@@ -165,7 +166,8 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                   }),
                   icon: const Icon(LucideIcons.minus),
                 ),
-                Text('$_quantity', style: Theme.of(context).textTheme.titleLarge),
+                Text('$_quantity',
+                    style: Theme.of(context).textTheme.titleLarge),
                 IconButton(
                   onPressed: () => setState(() {
                     _quantity++;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bunyan/core/app_router.dart';
-import 'package:bunyan/core/app_theme.dart';
-import 'package.flutter_localizations/flutter_localizations.dart';
+import 'package:bonyan/core/app_router.dart';
+import 'package:bonyan/core/app_theme.dart';
 
 void main() {
   // Ensure that widget binding is initialized before running the app.

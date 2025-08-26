@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:bunyan/core/app_theme.dart';
+import 'package:bonyan/core/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';

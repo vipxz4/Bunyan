@@ -1,5 +1,5 @@
-import 'package:bunyan/core/app_theme.dart';
-import 'package:bunyan/models/models.dart';
+import 'package:bonyan/core/app_theme.dart';
+import 'package:bonyan/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';

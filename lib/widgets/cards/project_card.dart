@@ -1,5 +1,5 @@
-import 'package:bunyan/core/app_theme.dart';
-import 'package:bunyan/models/project_model.dart';
+import 'package:bonyan/core/app_theme.dart';
+import 'package:bonyan/models/project_model.dart';
 import 'package:flutter/material.dart';
 
 class ProjectCard extends StatelessWidget {
@@ -55,9 +55,7 @@ class ProjectCard extends StatelessWidget {
                   Chip(
                     label: Text(project.status),
                     labelStyle: theme.textTheme.labelSmall?.copyWith(
-                      color: AppTheme.primary,
-                      fontWeight: FontWeight.bold
-                    ),
+                        color: AppTheme.primary, fontWeight: FontWeight.bold),
                     backgroundColor: AppTheme.secondary,
                     padding: EdgeInsets.zero,
                   ),
@@ -93,7 +91,6 @@ class ProjectCard extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment.center,
               children: [
                 Text(
                   project.name,

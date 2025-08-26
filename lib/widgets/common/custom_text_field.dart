@@ -1,4 +1,4 @@
-import 'package:bunyan/core/app_theme.dart';
+import 'package:bonyan/core/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 

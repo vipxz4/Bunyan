@@ -1,4 +1,4 @@
-import 'package:bunyan/models/models.dart';
+import 'package:bonyan/models/models.dart';
 
 // --- SINGLE INSTANCES ---
 

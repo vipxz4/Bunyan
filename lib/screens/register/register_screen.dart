@@ -1,9 +1,9 @@
-import 'package:bunyan/widgets/widgets.dart';
+import 'package:bonyan/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:bunyan/core/app_theme.dart';
+import 'package:bonyan/core/app_theme.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});

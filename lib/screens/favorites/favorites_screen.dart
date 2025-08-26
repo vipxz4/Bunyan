@@ -1,8 +1,8 @@
-import 'package:bunyan/core/app_theme.dart';
-import 'package:bunyan/models/models.dart';
-import 'package:bunyan/providers/favorites_provider.dart';
-import 'package:bunyan/providers/providers.dart';
-import 'package:bunyan/widgets/widgets.dart';
+import 'package:bonyan/core/app_theme.dart';
+import 'package:bonyan/models/models.dart';
+import 'package:bonyan/providers/favorites_provider.dart';
+import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -72,6 +72,8 @@ class _FavoriteProfessionalsList extends ConsumerWidget {
     );
   }
 }
+
+
 
 class _FavoriteProductsList extends ConsumerWidget {
   const _FavoriteProductsList();

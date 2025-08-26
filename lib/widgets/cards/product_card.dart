@@ -1,6 +1,6 @@
-import 'package:bunyan/core/app_theme.dart';
-import 'package:bunyan/models/models.dart';
-import 'package:bunyan/providers/providers.dart';
+import 'package:bonyan/core/app_theme.dart';
+import 'package:bonyan/models/models.dart';
+import 'package:bonyan/providers/providers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
