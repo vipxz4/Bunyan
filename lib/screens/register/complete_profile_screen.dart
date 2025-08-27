@@ -83,32 +83,50 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: const ScreenHeader(title: 'إكمال الملف الشخصي'),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'مرحباً بك! الرجاء إكمال بياناتك كـ"${widget.role}"',
-                style: Theme.of(context).textTheme.headlineSmall,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              ..._buildFormFields(widget.role),
-              const SizedBox(height: 24),
-              PrimaryButton(
-                text: 'حفظ ومتابعة',
-                onPressed: _submit,
-                isLoading: _isLoading,
-              ),
-            ],
-          ),
-        ),
+    final userDetailsAsync = ref.watch(userDetailsProvider);
+
+    return userDetailsAsync.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
       ),
+      error: (err, stack) => Scaffold(
+        body: Center(child: Text('حدث خطأ: ${err.toString()}')),
+      ),
+      data: (user) {
+        if (user == null) {
+          // This can happen briefly during logout or if the user doc is deleted.
+          return const Scaffold(
+            body: Center(child: Text('لم يتم العثور على المستخدم.')),
+          );
+        }
+        return Scaffold(
+          appBar: const ScreenHeader(title: 'إكمال الملف الشخصي'),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'مرحباً بك! الرجاء إكمال بياناتك كـ"${widget.role}"',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  ..._buildFormFields(widget.role),
+                  const SizedBox(height: 24),
+                  PrimaryButton(
+                    text: 'حفظ ومتابعة',
+                    onPressed: _submit,
+                    isLoading: _isLoading,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

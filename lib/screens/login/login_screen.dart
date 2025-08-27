@@ -1,6 +1,7 @@
 import 'package:bonyan/core/app_theme.dart';
 import 'package:bonyan/services/auth_service.dart';
 import 'package:bonyan/utils/error_handler.dart';
+import 'package:bonyan/utils/snackbar_helper.dart';
 import 'package:bonyan/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -40,9 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       } on FirebaseAuthException catch (e) {
         if (mounted) {
           final errorMessage = handleAuthException(e);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMessage)),
-          );
+          showErrorSnackBar(context, errorMessage);
         }
       } finally {
         if (mounted) {

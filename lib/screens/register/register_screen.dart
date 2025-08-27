@@ -1,5 +1,6 @@
 import 'package:bonyan/services/auth_service.dart';
 import 'package:bonyan/utils/error_handler.dart';
+import 'package:bonyan/utils/snackbar_helper.dart';
 import 'package:bonyan/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -38,16 +39,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedRole == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء اختيار دورك الأساسي.')),
-      );
+      showErrorSnackBar(context, 'الرجاء اختيار دورك الأساسي.');
       return;
     }
 
     if (!_termsAccepted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء الموافقة على الشروط والأحكام.')),
-      );
+      showErrorSnackBar(context, 'الرجاء الموافقة على الشروط والأحكام.');
       return;
     }
 
@@ -77,15 +74,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       } on FirebaseAuthException catch (e) {
         if (mounted) {
           final errorMessage = handleAuthException(e);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMessage)),
-          );
+          showErrorSnackBar(context, errorMessage);
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('فشل إنشاء المستخدم: ${e.toString()}')),
-          );
+          showErrorSnackBar(context, 'فشل إنشاء المستخدم: ${e.toString()}');
         }
       } finally {
         if (mounted) {
