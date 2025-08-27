@@ -99,6 +99,17 @@ final myReviewsProvider = StreamProvider.autoDispose<List<ReviewModel>>((ref) {
   );
 });
 
+final reviewsForProfessionalProvider =
+    StreamProvider.autoDispose.family<List<ReviewModel>, String>((ref, professionalId) {
+  final firestoreService =
+      ref.watch(firestoreServiceProvider(FirestoreCollections.reviews));
+  return firestoreService.collectionStream<ReviewModel>(
+    builder: (data, documentId) => ReviewModel.fromJson(data!, documentId),
+    queryBuilder: (query) =>
+        query.where('targetId', isEqualTo: professionalId).orderBy('date', descending: true),
+  );
+});
+
 // --- Stream-based Family Providers for Details ---
 
 final professionalDetailsProvider =
@@ -176,8 +187,41 @@ final productsActionsProvider = Provider<ProductsActions>((ref) {
 // --- Chat Actions Provider ---
 
 class ChatActions {
-  ChatActions(this._firestore);
+  ChatActions(this._firestore, this._ref);
   final FirebaseFirestore _firestore;
+  final Ref _ref;
+
+  Future<String> findOrCreateChat(String otherUserId) async {
+    final currentUser = _ref.read(userDetailsProvider).asData?.value;
+    if (currentUser == null) throw Exception('User not logged in');
+
+    final currentUserId = currentUser.id;
+    final members = [currentUserId, otherUserId]..sort(); // Sort to create a consistent ID
+
+    final chatQuery = await _firestore
+        .collection(FirestoreCollections.chats)
+        .where('participantIds', isEqualTo: members)
+        .limit(1)
+        .get();
+
+    if (chatQuery.docs.isNotEmpty) {
+      return chatQuery.docs.first.id;
+    } else {
+      // Create a new chat
+      // In a real app, we would get the other user's name and avatar
+      final newChat = ChatThreadModel(
+        id: '', // Firestore will generate
+        participantIds: members,
+        otherPartyName: 'New Chat', // Placeholder
+        lastMessage: 'Chat created.',
+        lastMessageTimestamp: DateTime.now(),
+        unreadCount: 0,
+        isOnline: false,
+      );
+      final docRef = await _firestore.collection(FirestoreCollections.chats).add(newChat.toJson());
+      return docRef.id;
+    }
+  }
 
   Future<void> sendMessage({
     required String chatId,
@@ -217,14 +261,15 @@ class ChatActions {
 }
 
 final chatActionsProvider = Provider<ChatActions>((ref) {
-  return ChatActions(FirebaseFirestore.instance);
+  return ChatActions(FirebaseFirestore.instance, ref);
 });
 
 // --- User Actions Provider ---
 
 class UserActions {
-  UserActions(this._firestore);
+  UserActions(this._firestore, this._ref);
   final FirebaseFirestore _firestore;
+  final Ref _ref;
 
   Future<void> updateUser(UserModel user) async {
     await _firestore
@@ -232,8 +277,56 @@ class UserActions {
         .doc(user.id)
         .update(user.toJson());
   }
+
+  Future<void> toggleProfessionalFavorite(String professionalId) async {
+    final user = _ref.read(userDetailsProvider).asData?.value;
+    if (user == null) throw Exception('User not logged in');
+
+    final isFavorite = user.favoriteProfessionalIds.contains(professionalId);
+    await _firestore
+        .collection(FirestoreCollections.users)
+        .doc(user.id)
+        .update({
+      'favoriteProfessionalIds': isFavorite
+          ? FieldValue.arrayRemove([professionalId])
+          : FieldValue.arrayUnion([professionalId]),
+    });
+  }
+
+  Future<void> toggleProductFavorite(String productId) async {
+    final user = _ref.read(userDetailsProvider).asData?.value;
+    if (user == null) throw Exception('User not logged in');
+
+    final isFavorite = user.favoriteProductIds.contains(productId);
+    await _firestore
+        .collection(FirestoreCollections.users)
+        .doc(user.id)
+        .update({
+      'favoriteProductIds': isFavorite
+          ? FieldValue.arrayRemove([productId])
+          : FieldValue.arrayUnion([productId]),
+    });
+  }
 }
 
 final userActionsProvider = Provider<UserActions>((ref) {
-  return UserActions(FirebaseFirestore.instance);
+  return UserActions(FirebaseFirestore.instance, ref);
+});
+
+// --- Notification Actions Provider ---
+
+class NotificationActions {
+  NotificationActions(this._firestore);
+  final FirebaseFirestore _firestore;
+
+  Future<void> markAsRead(String notificationId) async {
+    await _firestore
+        .collection(FirestoreCollections.notifications)
+        .doc(notificationId)
+        .update({'isRead': true});
+  }
+}
+
+final notificationActionsProvider = Provider<NotificationActions>((ref) {
+  return NotificationActions(FirebaseFirestore.instance);
 });
