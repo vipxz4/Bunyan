@@ -60,6 +60,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             SnackBar(content: Text(errorMessage)),
           );
         }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('فشل إنشاء المستخدم: ${e.toString()}')),
+          );
+        }
       } finally {
         if (mounted) {
           setState(() => _isLoading = false);
