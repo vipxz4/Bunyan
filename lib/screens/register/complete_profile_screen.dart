@@ -1,10 +1,13 @@
 import 'package:bonyan/services/auth_service.dart';
+import 'package:bonyan/services/storage_service.dart';
 import 'package:bonyan/models/user_model.dart';
 import 'package:bonyan/providers/data_providers.dart';
+import 'dart:io';
 import 'package:bonyan/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package.flutter_riverpod/flutter_riverpod.dart';
 import 'package:bonyan/widgets/widgets.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 
@@ -21,22 +24,40 @@ class CompleteProfileScreen extends ConsumerStatefulWidget {
 class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  File? _imageFile;
 
-  // Controllers for each potential field
+  // Controllers for all potential fields
   final _phoneController = TextEditingController();
-  final _companyNameController = TextEditingController();
   final _addressController = TextEditingController();
+  final _companyNameController = TextEditingController();
+  final _productTypeController = TextEditingController();
   final _specializationController = TextEditingController();
   final _experienceController = TextEditingController();
+  final _certificationsController = TextEditingController();
+  final _portfolioController = TextEditingController();
 
   @override
   void dispose() {
     _phoneController.dispose();
-    _companyNameController.dispose();
     _addressController.dispose();
+    _companyNameController.dispose();
+    _productTypeController.dispose();
     _specializationController.dispose();
     _experienceController.dispose();
+    _certificationsController.dispose();
+    _portfolioController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
   }
 
   Future<void> _submit() async {
@@ -47,21 +68,30 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
 
     final user = ref.read(userDetailsProvider).asData?.value;
     if (user == null) {
+      showErrorSnackBar(context, 'حدث خطأ غير متوقع: لم يتم العثور على المستخدم.');
       setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('لم يتم العثور على المستخدم.')),
-      );
       return;
     }
 
     try {
+      String? avatarUrl;
+      if (_imageFile != null) {
+        avatarUrl = await ref
+            .read(storageServiceProvider)
+            .uploadProfilePicture(uid: user.id, file: _imageFile!);
+      }
+
       final updatedUser = user.copyWith(
-        phoneNumber: _phoneController.text.isNotEmpty ? _phoneController.text : user.phoneNumber,
-        companyName: _companyNameController.text.isNotEmpty ? _companyNameController.text : user.companyName,
-        address: _addressController.text.isNotEmpty ? _addressController.text : user.address,
-        specialization: _specializationController.text.isNotEmpty ? _specializationController.text : user.specialization,
-        yearsOfExperience: _experienceController.text.isNotEmpty ? int.tryParse(_experienceController.text) : user.yearsOfExperience,
-        isProfileComplete: true, // Mark profile as complete
+        phoneNumber: _phoneController.text,
+        address: _addressController.text,
+        companyName: _companyNameController.text,
+        productType: _productTypeController.text,
+        specialization: _specializationController.text,
+        yearsOfExperience: int.tryParse(_experienceController.text),
+        certifications: _certificationsController.text,
+        portfolio: _portfolioController.text,
+        isProfileComplete: true,
+        avatarUrl: avatarUrl, // This will be null if no image is picked/uploaded
       );
 
       await ref.read(userActionsProvider).updateUser(updatedUser);
@@ -71,9 +101,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('فشل تحديث الملف الشخصي: ${e.toString()}')),
-        );
+        showErrorSnackBar(context, 'فشل تحديث الملف الشخصي: ${e.toString()}');
       }
     } finally {
       if (mounted) {
@@ -95,7 +123,6 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
       ),
       data: (user) {
         if (user == null) {
-          // This can happen briefly during logout or if the user doc is deleted.
           return const Scaffold(
             body: Center(child: Text('لم يتم العثور على المستخدم.')),
           );
@@ -114,6 +141,14 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
                     style: Theme.of(context).textTheme.headlineSmall,
                     textAlign: TextAlign.center,
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'الحقول المميزة بعلامة * إلزامية',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  _buildImagePicker(),
                   const SizedBox(height: 24),
                   ..._buildFormFields(widget.role),
                   const SizedBox(height: 24),
@@ -131,40 +166,80 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
     );
   }
 
+  Widget _buildImagePicker() {
+    return Center(
+      child: Stack(
+        children: [
+          CircleAvatar(
+            radius: 60,
+            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+            backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
+            child: _imageFile == null
+                ? const Icon(LucideIcons.user, size: 50, color: Colors.grey)
+                : null,
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: IconButton(
+              icon: const Icon(LucideIcons.camera),
+              onPressed: _pickImage,
+              style: IconButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   List<Widget> _buildFormFields(String role) {
     List<Widget> fields = [];
 
-    // The role names are in Arabic as seen in register_screen.dart
+    // Mandatory for all
+    fields.addAll([
+      CustomTextField(
+        controller: _phoneController,
+        labelText: 'رقم الهاتف *',
+        hintText: 'ادخل رقم هاتفك بالتنسيق اليمني',
+        keyboardType: TextInputType.phone,
+        prefixIcon: LucideIcons.phone,
+        validator: Validators.validateYemeniPhoneNumber,
+      ),
+      const SizedBox(height: 20),
+      CustomTextField(
+        controller: _addressController,
+        labelText: 'العنوان *',
+        hintText: 'ادخل عنوانك',
+        prefixIcon: LucideIcons.mapPin,
+        validator: (value) => Validators.validateNotEmpty(value, 'العنوان'),
+      ),
+      const SizedBox(height: 20),
+    ]);
+
+    // Role-specific fields
     switch (role) {
       case 'عميل':
-        fields.add(
-          CustomTextField(
-            controller: _phoneController,
-            labelText: 'رقم الهاتف',
-            hintText: 'ادخل رقم هاتفك',
-            keyboardType: TextInputType.phone,
-            prefixIcon: LucideIcons.phone,
-            validator: Validators.validateYemeniPhoneNumber,
-          ),
-        );
+        // Client only has the mandatory fields defined above.
         break;
       case 'مورد':
         fields.addAll([
           CustomTextField(
             controller: _companyNameController,
-            labelText: 'اسم الشركة',
+            labelText: 'اسم الشركة (اختياري)',
             hintText: 'ادخل اسم شركتك',
             prefixIcon: LucideIcons.building,
-            validator: (value) =>
-                Validators.validateNotEmpty(value, 'اسم الشركة'),
+            validator: null, // Optional
           ),
           const SizedBox(height: 20),
           CustomTextField(
-            controller: _addressController,
-            labelText: 'العنوان',
-            hintText: 'ادخل عنوان عملك',
-            prefixIcon: LucideIcons.mapPin,
-            validator: (value) => Validators.validateNotEmpty(value, 'العنوان'),
+            controller: _productTypeController,
+            labelText: 'نوع المنتجات (اختياري)',
+            hintText: 'مثال: مواد بناء، أدوات كهربائية',
+            prefixIcon: LucideIcons.package,
+            validator: null, // Optional
           ),
         ]);
         break;
@@ -172,7 +247,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
         fields.addAll([
           CustomTextField(
             controller: _specializationController,
-            labelText: 'التخصص',
+            labelText: 'التخصص *',
             hintText: 'مثال: سباك، كهربائي',
             prefixIcon: LucideIcons.wrench,
             validator: (value) => Validators.validateNotEmpty(value, 'التخصص'),
@@ -180,12 +255,27 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
           const SizedBox(height: 20),
           CustomTextField(
             controller: _experienceController,
-            labelText: 'سنوات الخبرة',
+            labelText: 'سنوات الخبرة (اختياري)',
             hintText: 'ادخل عدد سنوات الخبرة',
             keyboardType: TextInputType.number,
             prefixIcon: LucideIcons.award,
-            validator: (value) =>
-                Validators.validateNotEmpty(value, 'سنوات الخبرة'),
+            validator: null, // Optional
+          ),
+          const SizedBox(height: 20),
+          CustomTextField(
+            controller: _certificationsController,
+            labelText: 'الشهادات (اختياري)',
+            hintText: 'اذكر شهاداتك المهنية',
+            prefixIcon: LucideIcons.fileText,
+            validator: null, // Optional
+          ),
+          const SizedBox(height: 20),
+          CustomTextField(
+            controller: _portfolioController,
+            labelText: 'سجل الأعمال (اختياري)',
+            hintText: 'رابط أو وصف لأعمال سابقة',
+            prefixIcon: LucideIcons.briefcase,
+            validator: null, // Optional
           ),
         ]);
         break;

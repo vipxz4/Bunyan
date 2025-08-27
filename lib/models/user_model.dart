@@ -15,10 +15,13 @@ class UserModel {
   // Supplier-specific fields
   final String? companyName;
   final String? address;
+  final String? productType;
 
   // Professional-specific fields
   final String? specialization;
   final int? yearsOfExperience;
+  final String? certifications;
+  final String? portfolio;
 
   // Metadata
   final bool isProfileComplete;
@@ -33,8 +36,11 @@ class UserModel {
     this.favoriteProfessionalIds = const [],
     this.companyName,
     this.address,
+    this.productType,
     this.specialization,
     this.yearsOfExperience,
+    this.certifications,
+    this.portfolio,
     this.isProfileComplete = false,
   });
 
@@ -50,8 +56,11 @@ class UserModel {
           List<String>.from(json['favoriteProfessionalIds'] ?? []),
       companyName: json['companyName'],
       address: json['address'],
+      productType: json['productType'],
       specialization: json['specialization'],
       yearsOfExperience: json['yearsOfExperience'],
+      certifications: json['certifications'],
+      portfolio: json['portfolio'],
       isProfileComplete: json['isProfileComplete'] ?? false,
     );
   }
@@ -66,8 +75,11 @@ class UserModel {
       'favoriteProfessionalIds': favoriteProfessionalIds,
       'companyName': companyName,
       'address': address,
+      'productType': productType,
       'specialization': specialization,
       'yearsOfExperience': yearsOfExperience,
+      'certifications': certifications,
+      'portfolio': portfolio,
       'isProfileComplete': isProfileComplete,
     };
   }
@@ -82,8 +94,11 @@ class UserModel {
     List<String>? favoriteProfessionalIds,
     String? companyName,
     String? address,
+    String? productType,
     String? specialization,
     int? yearsOfExperience,
+    String? certifications,
+    String? portfolio,
     bool? isProfileComplete,
   }) {
     return UserModel(
@@ -97,8 +112,11 @@ class UserModel {
           favoriteProfessionalIds ?? this.favoriteProfessionalIds,
       companyName: companyName ?? this.companyName,
       address: address ?? this.address,
+      productType: productType ?? this.productType,
       specialization: specialization ?? this.specialization,
       yearsOfExperience: yearsOfExperience ?? this.yearsOfExperience,
+      certifications: certifications ?? this.certifications,
+      portfolio: portfolio ?? this.portfolio,
       isProfileComplete: isProfileComplete ?? this.isProfileComplete,
     );
   }
