@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -35,11 +36,19 @@ extension NotificationTypeExtension on NotificationType {
         return const Color(0xFF4A4E9D); // primary
     }
   }
+
+  static NotificationType fromString(String? typeString) {
+    return NotificationType.values.firstWhere(
+      (type) => type.name == typeString,
+      orElse: () => NotificationType.message, // Default value
+    );
+  }
 }
 
 @immutable
 class NotificationModel {
   final String id;
+  final String userId; // ID of the user this notification is for
   final String title;
   final String body;
   final DateTime timestamp;
@@ -48,6 +57,7 @@ class NotificationModel {
 
   const NotificationModel({
     required this.id,
+    required this.userId,
     required this.title,
     required this.body,
     required this.timestamp,
@@ -55,8 +65,32 @@ class NotificationModel {
     this.isRead = false,
   });
 
+  factory NotificationModel.fromJson(Map<String, dynamic> json, String id) {
+    return NotificationModel(
+      id: id,
+      userId: json['userId'] ?? '',
+      title: json['title'] ?? '',
+      body: json['body'] ?? '',
+      timestamp: (json['timestamp'] as Timestamp).toDate(),
+      type: NotificationTypeExtension.fromString(json['type']),
+      isRead: json['isRead'] ?? false,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'userId': userId,
+      'title': title,
+      'body': body,
+      'timestamp': Timestamp.fromDate(timestamp),
+      'type': type.name,
+      'isRead': isRead,
+    };
+  }
+
   NotificationModel copyWith({
     String? id,
+    String? userId,
     String? title,
     String? body,
     DateTime? timestamp,

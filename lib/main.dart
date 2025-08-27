@@ -3,8 +3,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bonyan/core/app_router.dart';
 import 'package:bonyan/core/app_theme.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:bonyan/firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   // Ensure that widget binding is initialized before running the app.

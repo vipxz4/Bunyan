@@ -35,9 +35,26 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   }
 
   void _register() async {
-    if (_formKey.currentState!.validate() && !_isLoading) {
-      setState(() => _isLoading = true);
-      try {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (_selectedRole == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('الرجاء اختيار دورك الأساسي.')),
+      );
+      return;
+    }
+
+    if (!_termsAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('الرجاء الموافقة على الشروط والأحكام.')),
+      );
+      return;
+    }
+
+    if (_isLoading) return;
+
+    setState(() => _isLoading = true);
+    try {
         final userCredential =
             await ref.read(authServiceProvider).signUpWithEmailAndPassword(
                   _emailController.text,

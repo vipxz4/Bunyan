@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:bonyan/models/product_model.dart';
 import 'package:bonyan/providers/data_providers.dart';
 import 'package:bonyan/widgets/widgets.dart';
@@ -9,7 +8,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 class AddEditProductScreen extends ConsumerStatefulWidget {
   const AddEditProductScreen({super.key, this.productId});
-
   final String? productId;
 
   @override
@@ -21,43 +19,13 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
   final _formKey = GlobalKey<FormState>();
   bool get _isEditMode => widget.productId != null;
 
-  late final TextEditingController _nameController;
-  late final TextEditingController _descriptionController;
-  late final TextEditingController _priceController;
-  late final TextEditingController _stockController;
+  final _nameController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  final _priceController = TextEditingController();
+  final _stockController = TextEditingController();
+  final _unitController = TextEditingController(text: 'للكيس'); // Default value
 
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController();
-    _descriptionController = TextEditingController();
-    _priceController = TextEditingController();
-    _stockController = TextEditingController();
-
-    if (_isEditMode) {
-      // In a real app, you would fetch this from a provider.
-      // For this mock, we find it in the list.
-      final existingProduct = ref
-          .read(productsProvider)
-          .firstWhere((p) => p.id == widget.productId, orElse: () {
-        // This is a fallback, should ideally not happen if IDs are correct.
-        return const ProductModel(
-            id: '',
-            name: 'Not Found',
-            price: 0,
-            unit: '',
-            imageUrl: '',
-            supplierId: '',
-            supplierName: '',
-            description: '');
-      });
-
-      _nameController.text = existingProduct.name;
-      _descriptionController.text = existingProduct.description;
-      _priceController.text = existingProduct.price.toStringAsFixed(0);
-      _stockController.text = existingProduct.stock.toString();
-    }
-  }
+  ProductModel? _initialProduct;
 
   @override
   void dispose() {
@@ -65,84 +33,127 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
     _descriptionController.dispose();
     _priceController.dispose();
     _stockController.dispose();
+    _unitController.dispose();
     super.dispose();
+  }
+
+  void _setupControllers(ProductModel product) {
+    _nameController.text = product.name;
+    _descriptionController.text = product.description;
+    _priceController.text = product.price.toStringAsFixed(0);
+    _stockController.text = product.stock.toString();
+    _unitController.text = product.unit;
+    _initialProduct = product;
   }
 
   @override
   Widget build(BuildContext context) {
+    final productAsyncValue = _isEditMode
+        ? ref.watch(productDetailsProvider(widget.productId!))
+        : const AsyncData(null);
+
+    // Listen to the stream and update controllers when data arrives.
+    productAsyncValue.whenData((product) {
+      if (product != null && _initialProduct == null) {
+        _setupControllers(product);
+      }
+    });
+
     return Scaffold(
       appBar: ScreenHeader(
         title: _isEditMode ? 'تعديل المنتج' : 'إضافة منتج جديد',
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CustomTextField(
-                controller: _nameController,
-                labelText: 'اسم المنتج',
-                hintText: 'مثال: إسمنت مقاوم',
+      body: productAsyncValue.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('Error: $err')),
+        data: (product) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CustomTextField(controller: _nameController, labelText: 'اسم المنتج'),
+                  const SizedBox(height: 20),
+                  CustomTextField(controller: _descriptionController, labelText: 'الوصف', maxLines: 4),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: CustomTextField(
+                          controller: _priceController,
+                          labelText: 'السعر',
+                          keyboardType: TextInputType.number,
+                          prefixIcon: LucideIcons.dollarSign,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: CustomTextField(
+                          controller: _unitController,
+                          labelText: 'الوحدة',
+                          hintText: 'مثال: للكيس',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  CustomTextField(
+                    controller: _stockController,
+                    labelText: 'الكمية المتوفرة',
+                    keyboardType: TextInputType.number,
+                    prefixIcon: LucideIcons.package,
+                  ),
+                  const SizedBox(height: 32),
+                  PrimaryButton(
+                    text: _isEditMode ? 'حفظ التعديلات' : 'إضافة المنتج',
+                    onPressed: _submitForm,
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: _descriptionController,
-                labelText: 'الوصف',
-                hintText: 'أدخل وصفاً للمنتج...',
-                maxLines: 4,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: _priceController,
-                labelText: 'السعر (بالريال)',
-                hintText: '5500',
-                keyboardType: TextInputType.number,
-                prefixIcon: LucideIcons.dollarSign,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: _stockController,
-                labelText: 'الكمية المتوفرة (المخزون)',
-                hintText: '200',
-                keyboardType: TextInputType.number,
-                prefixIcon: LucideIcons.package,
-              ),
-              const SizedBox(height: 32),
-              PrimaryButton(
-                text: _isEditMode ? 'حفظ التعديلات' : 'إضافة المنتج',
-                onPressed: _submitForm,
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      final newProduct = ProductModel(
-        id: _isEditMode ? widget.productId! : Random().nextInt(10000).toString(),
+      final user = ref.read(userDetailsProvider).asData?.value;
+      if (user == null || user.role != 'مورد') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('يجب أن تكون موردًا لإضافة منتجات.')),
+        );
+        return;
+      }
+
+      final product = ProductModel(
+        id: _isEditMode ? widget.productId! : '', // Firestore generates ID on add
         name: _nameController.text,
         description: _descriptionController.text,
         price: double.tryParse(_priceController.text) ?? 0,
         stock: int.tryParse(_stockController.text) ?? 0,
-        // Mocking these values as they are not in the form
-        unit: 'للكيس',
-        imageUrl: 'https://via.placeholder.com/150',
-        supplierId: 'sup-nahda',
-        supplierName: 'مؤسسة النهضة للمقاولات',
+        unit: _unitController.text,
+        imageUrl: _initialProduct?.imageUrl ?? 'https://via.placeholder.com/150', // Keep old or use placeholder
+        supplierId: user.id,
+        supplierName: user.fullName,
       );
 
-      if (_isEditMode) {
-        ref.read(productsProvider.notifier).editProduct(newProduct);
-      } else {
-        ref.read(productsProvider.notifier).addProduct(newProduct);
+      try {
+        final actions = ref.read(productsActionsProvider);
+        if (_isEditMode) {
+          await actions.editProduct(product);
+        } else {
+          await actions.addProduct(product);
+        }
+        context.pop();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('فشل حفظ المنتج: $e')),
+        );
       }
-
-      context.pop();
     }
   }
 }

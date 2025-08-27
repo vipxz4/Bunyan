@@ -24,6 +24,33 @@ class ProductModel {
     this.stock = 0,
   });
 
+  factory ProductModel.fromJson(Map<String, dynamic> json, String id) {
+    return ProductModel(
+      id: id,
+      name: json['name'] ?? '',
+      price: (json['price'] ?? 0).toDouble(),
+      unit: json['unit'] ?? '',
+      imageUrl: json['imageUrl'] ?? '',
+      supplierId: json['supplierId'] ?? '',
+      supplierName: json['supplierName'] ?? '',
+      description: json['description'] ?? '',
+      stock: json['stock'] ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'price': price,
+      'unit': unit,
+      'imageUrl': imageUrl,
+      'supplierId': supplierId,
+      'supplierName': supplierName,
+      'description': description,
+      'stock': stock,
+    };
+  }
+
   ProductModel copyWith({
     String? id,
     String? name,
