@@ -67,7 +67,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           child: Center(child: CircularProgressIndicator())),
                       error: (err, stack) => SizedBox(
                           height: 140,
-                          child: Center(child: Text('Could not load projects'))),
+                          child: ErrorDisplayWidget(errorMessage: err.toString())),
                       data: (projects) => HorizontalCardCarousel(
                         height: 140,
                         itemCount: projects.length,
@@ -87,8 +87,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           child: Center(child: CircularProgressIndicator())),
                       error: (err, stack) => SizedBox(
                           height: 220,
-                          child: Center(
-                              child: Text('Could not load professionals'))),
+                          child: ErrorDisplayWidget(errorMessage: err.toString())),
                       data: (professionals) => HorizontalCardCarousel(
                         height: 220,
                         itemCount: professionals.length,
