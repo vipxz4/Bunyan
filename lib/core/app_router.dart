@@ -33,6 +33,9 @@ import 'package:bonyan/screens/supplier_dashboard/add_edit_product_screen.dart';
 import 'package:bonyan/screens/service_provider_dashboard/service_provider_dashboard_screen.dart';
 import 'package:bonyan/screens/service_provider_dashboard/sp_my_projects_screen.dart';
 import 'package:bonyan/screens/service_provider_dashboard/sp_my_bids_screen.dart';
+import 'package:bonyan/screens/service_provider_dashboard/sp_ratings_screen.dart';
+import 'package:bonyan/screens/service_provider_dashboard/sp_earnings_screen.dart';
+import 'package:bonyan/screens/guarantee_funding/guarantee_funding_screen.dart';
 import 'package:bonyan/screens/forgot_password/forgot_password_screen.dart';
 import 'package:bonyan/screens/splash/splash_screen.dart';
 import 'package:bonyan/screens/supplier_profile/supplier_profile_screen.dart';
@@ -160,7 +163,14 @@ final goRouter = GoRouter(
                   path: 'checkout-summary',
                   name: 'checkout-summary',
                   builder: (context, state) => const CheckoutSummaryScreen(),
-                ),
+                  routes: [
+                    GoRoute(
+                      path: 'guarantee-funding',
+                      name: 'guarantee-funding',
+                      builder: (context, state) =>
+                          const GuaranteeFundingScreen(),
+                    ),
+                  ]),
                 GoRoute(
                     path: 'notifications',
                     name: 'notifications',
@@ -289,6 +299,16 @@ final goRouter = GoRouter(
                         path: 'my-bids',
                         name: 'sp-my-bids',
                         builder: (context, state) => const SpMyBidsScreen(),
+                      ),
+                      GoRoute(
+                        path: 'my-ratings',
+                        name: 'sp-my-ratings',
+                        builder: (context, state) => const SpRatingsScreen(),
+                      ),
+                      GoRoute(
+                        path: 'my-earnings',
+                        name: 'sp-my-earnings',
+                        builder: (context, state) => const SpEarningsScreen(),
                       ),
                     ]),
               ],

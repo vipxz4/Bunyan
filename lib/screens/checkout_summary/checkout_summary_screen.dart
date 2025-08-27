@@ -42,9 +42,7 @@ class CheckoutSummaryScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         child: PrimaryButton(
           text: 'تأكيد والانتقال لتمويل الضمان',
-          onPressed: () {
-            // TODO: Navigate to guarantee funding screen
-          },
+          onPressed: () => context.push('/home/checkout-summary/guarantee-funding'),
         ),
       ),
     );

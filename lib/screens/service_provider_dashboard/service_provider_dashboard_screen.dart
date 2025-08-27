@@ -34,17 +34,15 @@ class ServiceProviderDashboardScreen extends StatelessWidget {
             icon: LucideIcons.star,
             label: 'تقييماتي',
             value: '4.9', // Mock data
-            onTap: () {
-              // TODO: Navigate to ratings screen
-            },
+            onTap: () =>
+                context.push('/account/service-provider-dashboard/my-ratings'),
           ),
           _DashboardCard(
             icon: LucideIcons.lineChart,
             label: 'الأرباح',
             value: '2.5M ريال', // Mock data
-            onTap: () {
-              // TODO: Navigate to earnings screen
-            },
+            onTap: () =>
+                context.push('/account/service-provider-dashboard/my-earnings'),
           ),
         ],
       ),
