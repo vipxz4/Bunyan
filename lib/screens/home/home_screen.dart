@@ -8,61 +8,108 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final activeProjects = ref.watch(activeProjectsProvider);
-    final recommendedProfessionals = ref.watch(recommendedProfessionalsProvider);
-    final user = ref.watch(userProvider);
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  late final TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userAsync = ref.watch(userDetailsProvider);
+    final projectsAsync = ref.watch(allMyProjectsProvider);
+    final professionalsAsync = ref.watch(recommendedProfessionalsProvider);
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          _buildHeader(context, user),
-          _buildQuickAccessGrid(context),
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                const SizedBox(height: 24),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: _buildSearchCards(context),
+      body: userAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => ErrorDisplayWidget(errorMessage: err.toString()),
+        data: (user) {
+          if (user == null) {
+            return const Center(child: Text('User not logged in.'));
+          }
+          return CustomScrollView(
+            slivers: [
+              _buildHeader(context, user, _searchController),
+              _buildQuickAccessGrid(context),
+              SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 24),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: _buildSearchCards(context),
+                    ),
+                    SectionHeader(
+                      title: 'مشاريعي النشطة',
+                      onViewAll: () => context.push('/home/my-projects'),
+                    ),
+                    projectsAsync.when(
+                      loading: () => const SizedBox(
+                          height: 140,
+                          child: Center(child: CircularProgressIndicator())),
+                      error: (err, stack) => SizedBox(
+                          height: 140,
+                          child: Center(child: Text('Could not load projects'))),
+                      data: (projects) => HorizontalCardCarousel(
+                        height: 140,
+                        itemCount: projects.length,
+                        itemBuilder: (context, index) {
+                          return ProjectCard(
+                              project: projects[index], isMini: true);
+                        },
+                      ),
+                    ),
+                    SectionHeader(
+                      title: 'مهنيون موصى بهم',
+                      onViewAll: () => context.push('/home/professional-search'),
+                    ),
+                    professionalsAsync.when(
+                      loading: () => const SizedBox(
+                          height: 220,
+                          child: Center(child: CircularProgressIndicator())),
+                      error: (err, stack) => SizedBox(
+                          height: 220,
+                          child: Center(
+                              child: Text('Could not load professionals'))),
+                      data: (professionals) => HorizontalCardCarousel(
+                        height: 220,
+                        itemCount: professionals.length,
+                        itemBuilder: (context, index) {
+                          return ProfessionalCard(
+                              professional: professionals[index], isMini: true);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-                SectionHeader(
-                  title: 'مشاريعي النشطة',
-                  onViewAll: () {},
-                ),
-                HorizontalCardCarousel(
-                  height: 140,
-                  itemCount: activeProjects.length,
-                  itemBuilder: (context, index) {
-                    return ProjectCard(project: activeProjects[index], isMini: true);
-                  },
-                ),
-                SectionHeader(
-                  title: 'مهنيون موصى بهم',
-                  onViewAll: () {},
-                ),
-                HorizontalCardCarousel(
-                  height: 220,
-                  itemCount: recommendedProfessionals.length,
-                  itemBuilder: (context, index) {
-                    return ProfessionalCard(
-                        professional: recommendedProfessionals[index], isMini: true);
-                  },
-                ),
-                const SizedBox(height: 24),
-              ],
-            ),
-          )
-        ],
+              )
+            ],
+          );
+        },
       ),
     );
   }
 
-  SliverAppBar _buildHeader(BuildContext context, UserModel user) {
+  SliverAppBar _buildHeader(
+      BuildContext context, UserModel user, TextEditingController controller) {
     final textTheme = Theme.of(context).textTheme;
     return SliverAppBar(
       backgroundColor: AppTheme.primary,
@@ -93,7 +140,8 @@ class HomeScreen extends ConsumerWidget {
                     ),
                     const SizedBox(width: 12),
                     Text('أهلاً، ${user.fullName}',
-                        style: textTheme.titleLarge?.copyWith(color: Colors.white)),
+                        style: textTheme.titleLarge
+                            ?.copyWith(color: Colors.white)),
                     const Spacer(),
                     IconButton(
                       icon: const Icon(LucideIcons.bell, color: Colors.white),
@@ -103,10 +151,19 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 const Spacer(),
                 TextField(
+                  controller: controller,
+                  onSubmitted: (query) {
+                    if (query.isNotEmpty) {
+                      // For simplicity, we'll have one general search results page
+                      // In a real app, you might have separate ones or a tabbed results page
+                      context.push('/home/search-results?q=$query');
+                    }
+                  },
                   decoration: InputDecoration(
-                    hintText: 'بحث...',
+                    hintText: 'ابحث عن مهنيين, مواد...',
                     hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
-                    prefixIcon: const Icon(LucideIcons.search, color: Colors.white),
+                    prefixIcon:
+                        const Icon(LucideIcons.search, color: Colors.white),
                     filled: true,
                     fillColor: Colors.white.withOpacity(0.3),
                     contentPadding: const EdgeInsets.symmetric(vertical: 0),

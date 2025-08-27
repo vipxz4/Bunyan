@@ -6,6 +6,7 @@ import 'package:bonyan/screens/onboarding/onboarding_screen.dart';
 import 'package:bonyan/screens/otp/otp_screen.dart';
 import 'package:bonyan/screens/register/register_screen.dart';
 import 'package:bonyan/screens/materials_search/materials_search_screen.dart';
+import 'package:bonyan/screens/general_search_results/general_search_results_screen.dart';
 import 'package:bonyan/screens/materials_search_results/materials_search_results_screen.dart';
 import 'package:bonyan/screens/product_details/product_details_screen.dart';
 import 'package:bonyan/screens/professional_profile/professional_profile_screen.dart';
@@ -224,6 +225,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   name: 'favorites',
                   builder: (context, state) => const FavoritesScreen(),
                 ),
+                GoRoute(
+                    path: 'search-results',
+                    name: 'search-results',
+                    builder: (context, state) {
+                      final query = state.uri.queryParameters['q'] ?? '';
+                      return GeneralSearchResultsScreen(query: query);
+                    }),
               ],
             ),
           ],

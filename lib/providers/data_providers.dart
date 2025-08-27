@@ -1,5 +1,6 @@
 import 'package:bonyan/constants/firestore_collections.dart';
 import 'package:bonyan/models/models.dart';
+import 'package:bonyan/models/search_result_model.dart';
 import 'package:bonyan/services/auth_service.dart';
 import 'package:bonyan/services/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -329,4 +330,40 @@ class NotificationActions {
 
 final notificationActionsProvider = Provider<NotificationActions>((ref) {
   return NotificationActions(FirebaseFirestore.instance);
+});
+
+
+// --- Search Provider ---
+
+final generalSearchProvider =
+    FutureProvider.autoDispose.family<List<SearchResult>, String>((ref, query) async {
+  if (query.isEmpty) {
+    return [];
+  }
+
+  final lowerCaseQuery = query.toLowerCase();
+  final productSearchFuture = ref
+      .watch(firestoreServiceProvider(FirestoreCollections.products))
+      .getCollection<SearchResult>(
+        builder: (data, documentId) => SearchResult(
+            product: ProductModel.fromJson(data!, documentId)),
+        queryBuilder: (q) => q
+            .where('name', isGreaterThanOrEqualTo: lowerCaseQuery)
+            .where('name', isLessThanOrEqualTo: '$lowerCaseQuery\uf8ff'),
+      );
+
+  final professionalSearchFuture = ref
+      .watch(firestoreServiceProvider(FirestoreCollections.professionals))
+      .getCollection<SearchResult>(
+        builder: (data, documentId) => SearchResult(
+            professional: ProfessionalModel.fromJson(data!, documentId)),
+        queryBuilder: (q) => q
+            .where('name', isGreaterThanOrEqualTo: lowerCaseQuery)
+            .where('name', isLessThanOrEqualTo: '$lowerCaseQuery\uf8ff'),
+      );
+
+  final results = await Future.wait([productSearchFuture, professionalSearchFuture]);
+
+  // Flatten the list of lists into a single list
+  return results.expand((list) => list).toList();
 });
