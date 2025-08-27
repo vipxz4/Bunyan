@@ -154,7 +154,7 @@ class AccountScreen extends ConsumerWidget {
                   Text(user.fullName,
                       style:
                           textTheme.headlineSmall?.copyWith(color: Colors.white)),
-                  Text(user.phoneNumber,
+                  Text(user.phoneNumber ?? '',
                       style:
                           textTheme.bodyMedium?.copyWith(color: Colors.white70)),
                 ],
