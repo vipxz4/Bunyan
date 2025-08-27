@@ -1,5 +1,7 @@
 import 'package:bonyan/services/auth_service.dart';
+import 'package:bonyan/utils/error_handler.dart';
 import 'package:bonyan/widgets/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,10 +53,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               );
         }
         // On success, the auth state listener in the router should handle navigation.
-      } catch (e) {
+      } on FirebaseAuthException catch (e) {
         if (mounted) {
+          final errorMessage = handleAuthException(e);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.toString())),
+            SnackBar(content: Text(errorMessage)),
           );
         }
       } finally {
