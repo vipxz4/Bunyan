@@ -1,6 +1,7 @@
 import 'package:bonyan/core/app_theme.dart';
 import 'package:bonyan/models/user_model.dart';
 import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/services/auth_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,7 +78,7 @@ class AccountScreen extends ConsumerWidget {
                   SizedBox(
                     width: double.infinity,
                     child: TextButton(
-                      onPressed: () => _showLogoutDialog(context),
+                      onPressed: () => _showLogoutDialog(context, ref),
                       style: TextButton.styleFrom(
                         backgroundColor: AppTheme.red.withOpacity(0.1),
                         foregroundColor: AppTheme.red,
@@ -160,7 +161,7 @@ class AccountScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _showLogoutDialog(BuildContext context) async {
+  Future<void> _showLogoutDialog(BuildContext context, WidgetRef ref) async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -179,8 +180,9 @@ class AccountScreen extends ConsumerWidget {
               style: FilledButton.styleFrom(backgroundColor: AppTheme.red),
               child: const Text('تسجيل الخروج'),
               onPressed: () {
+                ref.read(authServiceProvider).signOut();
+                // The router's redirect logic will handle navigation.
                 Navigator.of(context).pop();
-                context.go('/login');
               },
             ),
           ],
