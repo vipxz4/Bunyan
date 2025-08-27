@@ -66,10 +66,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 uid: userCredential.user!.uid,
                 fullName: _nameController.text,
                 email: _emailController.text,
-                role: _selectedRole ?? 'عميل', // Default role
+                role: _selectedRole!, // Role is already validated to be non-null
               );
+
+          if (mounted) {
+            // Navigate to the profile completion screen
+            context.go('/complete-profile', extra: _selectedRole);
+          }
         }
-        // On success, the auth state listener in the router should handle navigation.
       } on FirebaseAuthException catch (e) {
         if (mounted) {
           final errorMessage = handleAuthException(e);

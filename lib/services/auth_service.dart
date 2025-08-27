@@ -48,12 +48,22 @@ class AuthService {
     required String role,
   }) async {
     try {
+      // Create a document with initial fields, initializing all possible
+      // fields to a default state to ensure type safety on reads.
       await _firestore.collection('users').doc(uid).set({
-        'uid': uid,
         'fullName': fullName,
         'email': email,
         'role': role,
         'createdAt': FieldValue.serverTimestamp(),
+        // Initialize other fields to their default/empty state.
+        'phoneNumber': null,
+        'avatarUrl': null,
+        'favoriteProductIds': [],
+        'favoriteProfessionalIds': [],
+        'companyName': null,
+        'address': null,
+        'specialization': null,
+        'yearsOfExperience': null,
       });
     } on FirebaseException catch (e) {
       // In a real app, handle this error more gracefully

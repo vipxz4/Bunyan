@@ -4,6 +4,7 @@ import 'package:bonyan/screens/login/login_screen.dart';
 import 'package:bonyan/screens/my_projects_list/my_projects_list_screen.dart';
 import 'package:bonyan/screens/onboarding/onboarding_screen.dart';
 import 'package:bonyan/screens/otp/otp_screen.dart';
+import 'package:bonyan/screens/register/complete_profile_screen.dart';
 import 'package:bonyan/screens/register/register_screen.dart';
 import 'package:bonyan/screens/materials_search/materials_search_screen.dart';
 import 'package:bonyan/screens/general_search_results/general_search_results_screen.dart';
@@ -62,19 +63,30 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     initialLocation: '/splash',
     navigatorKey: _rootNavigatorKey,
     redirect: (context, state) {
-      // If the user is not logged in, they can only access the auth pages.
       final isLoggedIn = authState.value != null;
-      final location = state.uri.toString();
-      final isAuthRoute = location == '/login' ||
-          location == '/register' ||
-          location == '/forgot-password';
-      final isPublicRoute =
-          isAuthRoute || location == '/splash' || location == '/onboarding';
+      final location = state.uri.path; // Use .path to ignore query params
 
+      // Routes that are part of the authentication flow.
+      final isAuthFlowRoute = location == '/login' ||
+          location == '/register' ||
+          location == '/forgot-password' ||
+          location == '/complete-profile';
+
+      // Routes that can be accessed without being logged in.
+      final isPublicRoute =
+          isAuthFlowRoute || location == '/splash' || location == '/onboarding';
+
+      // If user is not logged in and not on a public route, send to login.
       if (!isLoggedIn && !isPublicRoute) {
         return '/login';
       }
-      if (isLoggedIn && isAuthRoute) {
+
+      // If user IS logged in and tries to access pre-auth routes, send to home.
+      final isPreAuthRoute = location == '/login' ||
+          location == '/register' ||
+          location == '/forgot-password';
+
+      if (isLoggedIn && isPreAuthRoute) {
         return '/home';
       }
 
@@ -98,6 +110,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/register',
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+       GoRoute(
+        path: '/complete-profile',
+        name: 'complete-profile',
+        builder: (context, state) {
+          final role = state.extra as String? ?? 'عميل'; // Default to client
+          return CompleteProfileScreen(role: role);
+        },
       ),
       GoRoute(
         path: '/forgot-password',
