@@ -1,26 +1,54 @@
 import 'package:bonyan/core/app_theme.dart';
+import 'package:bonyan/services/auth_service.dart';
+import 'package:bonyan/utils/error_handler.dart';
 import 'package:bonyan/widgets/widgets.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _isLoading = false;
 
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   void _login() async {
-    setState(() => _isLoading = true);
-    // Simulate network request
-    await Future.delayed(const Duration(seconds: 2));
-    if (mounted) {
-      // Replace all routes with the home screen
-      context.go('/home');
+    if (_formKey.currentState!.validate() && !_isLoading) {
+      setState(() => _isLoading = true);
+      try {
+        await ref.read(authServiceProvider).signInWithEmailAndPassword(
+              _emailController.text,
+              _passwordController.text,
+            );
+        // On success, the auth state listener in the router should handle navigation.
+      } on FirebaseAuthException catch (e) {
+        if (mounted) {
+          final errorMessage = handleAuthException(e);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
     }
   }
 
@@ -31,37 +59,43 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            children: [
-              const SizedBox(height: 60),
-              const Icon(LucideIcons.building2,
-                  size: 64, color: AppTheme.primary),
-              const SizedBox(height: 16),
-              Text(
-                'تسجيل الدخول',
-                textAlign: TextAlign.center,
-                style: textTheme.displaySmall,
-              ),
-              const SizedBox(height: 40),
-              const CustomTextField(
-                labelText: 'رقم الهاتف',
-                hintText: '777 777 777',
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 20),
-              const CustomTextField(
-                labelText: 'كلمة المرور',
-                hintText: '********',
-                isPassword: true,
-                prefixIcon: LucideIcons.lock,
-              ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const SizedBox(height: 60),
+                const Icon(LucideIcons.building2,
+                    size: 64, color: AppTheme.primary),
+                const SizedBox(height: 16),
+                Text(
+                  'تسجيل الدخول',
+                  textAlign: TextAlign.center,
+                  style: textTheme.displaySmall,
+                ),
+                const SizedBox(height: 40),
+                CustomTextField(
+                  controller: _emailController,
+                  labelText: 'البريد الإلكتروني',
+                  hintText: 'example@email.com',
+                  keyboardType: TextInputType.emailAddress,
+                  prefixIcon: LucideIcons.mail,
+                  validator: (value) =>
+                      value!.isEmpty ? 'الرجاء إدخال البريد الإلكتروني' : null,
+                ),
+                const SizedBox(height: 20),
+                CustomTextField(
+                  controller: _passwordController,
+                  labelText: 'كلمة المرور',
+                  hintText: '********',
+                  isPassword: true,
+                  prefixIcon: LucideIcons.lock,
+                  validator: (value) =>
+                      value!.isEmpty ? 'الرجاء إدخال كلمة المرور' : null,
+                ),
               Align(
                 alignment: AlignmentDirectional.centerStart,
                 child: TextButton(
-                  onPressed: () {
-                    // TODO: Navigate to forgot password screen
-                    // context.push('/forgot-password');
-                  },
+                  onPressed: () => context.push('/forgot-password'),
                   child: const Text('نسيت كلمة المرور؟'),
                 ),
               ),
@@ -77,10 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   Text('ليس لديك حساب؟', style: textTheme.bodyMedium),
                   TextButton(
-                    onPressed: () {
-                      // TODO: Navigate to register screen
-                      // context.push('/register');
-                    },
+                    onPressed: () => context.push('/register'),
                     child: const Text('إنشاء حساب'),
                   ),
                 ],
@@ -90,6 +121,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 }

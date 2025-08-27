@@ -16,9 +16,11 @@ class SupplierProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final supplierAsync = ref.watch(supplierDetailsProvider(id));
-    final allProducts = ref.watch(productsProvider);
-    final supplierProducts =
-        allProducts.where((p) => p.supplierId == id).toList();
+    final allProductsAsync = ref.watch(productsProvider);
+    final supplierProducts = allProductsAsync.maybeWhen(
+      data: (products) => products.where((p) => p.supplierId == id).toList().cast<ProductModel>(),
+      orElse: () => <ProductModel>[],
+    );
 
     return supplierAsync.when(
           data: (supplier) {
@@ -177,7 +179,7 @@ class SupplierProfileScreen extends ConsumerWidget {
             flex: 1,
             child: OutlinedButton(
               child: const Text('تواصل'),
-              onPressed: () {},
+              onPressed: () => context.push('/home/chat/chat_supplier_1'),
             ),
           ),
           const SizedBox(width: 12),

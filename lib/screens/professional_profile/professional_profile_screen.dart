@@ -2,6 +2,7 @@ import 'package:bonyan/core/app_theme.dart';
 import 'package:bonyan/models/models.dart';
 import 'package:bonyan/providers/favorites_provider.dart';
 import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/widgets/common/error_display_widget.dart';
 import 'package:bonyan/widgets/widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -21,17 +22,12 @@ class ProfessionalProfileScreen extends ConsumerWidget {
     return professionalData.when(
       data: (professional) {
         if (professional == null) {
-          return const Scaffold(
-            body: Center(child: Text('لم يتم العثور على المهني المطلوب.')),
-          );
+          return Scaffold(appBar: AppBar(), body: const Center(child: Text('لم يتم العثور على المهني المطلوب.')));
         }
-        // Assuming reviews are fetched separately or part of another provider
-        final reviews = ref.watch(myReviewsProvider);
-
         return Scaffold(
           body: CustomScrollView(
             slivers: [
-              _buildHeader(context, professional),
+              _buildHeader(context, ref, professional),
               SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,8 +45,8 @@ class ProfessionalProfileScreen extends ConsumerWidget {
                           const SizedBox(height: 24),
                           _buildPortfolioSection(context, professional),
                           const SizedBox(height: 24),
-                          _buildReviewsSection(context, reviews),
-                          const SizedBox(height: 100), // For bottom nav bar spacing
+                          _buildReviewsSection(context, ref, professional.id),
+                          const SizedBox(height: 100),
                         ],
                       ),
                     ),
@@ -59,34 +55,30 @@ class ProfessionalProfileScreen extends ConsumerWidget {
               )
             ],
           ),
-          bottomNavigationBar: _buildActionButtons(context),
+          bottomNavigationBar: _buildActionButtons(context, ref, professional.id),
         );
       },
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (error, stack) => Scaffold(body: Center(child: Text('Error: $error'))),
+      error: (error, stack) => Scaffold(appBar: AppBar(), body: ErrorDisplayWidget(errorMessage: error.toString())),
     );
   }
 
-  SliverAppBar _buildHeader(BuildContext context, ProfessionalModel professional) {
+  SliverAppBar _buildHeader(BuildContext context, WidgetRef ref, ProfessionalModel professional) {
+    final favoriteIds = ref.watch(favoriteProfessionalsProvider);
+    final isFavorite = favoriteIds.contains(professional.id);
+
     return SliverAppBar(
       expandedHeight: 200,
       pinned: true,
       actions: [
-        Consumer(builder: (context, ref, _) {
-          final isFavorite = ref.watch(favoritesProvider
-              .select((favs) => favs.professionalIds.contains(id)));
-          return IconButton(
-            icon: Icon(
-                isFavorite ? LucideIcons.heart : LucideIcons.heart,
-                color: isFavorite ? AppTheme.red : Colors.white),
-            onPressed: () =>
-                ref.read(favoritesProvider.notifier).toggleProfessionalFavorite(id),
-            style: IconButton.styleFrom(backgroundColor: Colors.black26),
-          );
-        })
+        IconButton(
+          icon: Icon(isFavorite ? LucideIcons.heart : LucideIcons.heart, color: isFavorite ? AppTheme.red : Colors.white),
+          onPressed: () => ref.read(userActionsProvider).toggleProfessionalFavorite(professional.id),
+          style: IconButton.styleFrom(backgroundColor: Colors.black26),
+        )
       ],
       leading: IconButton(
-        icon: const Icon(LucideIcons.arrowRight, color: Colors.white),
+        icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
         onPressed: () => context.pop(),
         style: IconButton.styleFrom(backgroundColor: Colors.black26),
       ),
@@ -211,86 +203,95 @@ class ProfessionalProfileScreen extends ConsumerWidget {
     );
   }
 
-   Widget _buildReviewsSection(BuildContext context, List<ReviewModel> reviews) {
+  Widget _buildReviewsSection(BuildContext context, WidgetRef ref, String professionalId) {
+    final reviewsAsyncValue = ref.watch(reviewsForProfessionalProvider(professionalId));
     final textTheme = Theme.of(context).textTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('التقييمات (${reviews.length})', style: textTheme.headlineSmall),
+        Text('التقييمات', style: textTheme.headlineSmall),
         const SizedBox(height: 8),
-        ListView.separated(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: reviews.length > 2 ? 2 : reviews.length, // Show max 2 reviews
-          itemBuilder: (context, index) {
-            final review = reviews[index];
-            return Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppTheme.lightGray,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        reviewsAsyncValue.when(
+          loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+          error: (err, stack) => const Text('لا يمكن تحميل التقييمات.'),
+          data: (reviews) {
+            if (reviews.isEmpty) {
+              return const Text('لا توجد تقييمات لهذا المهني بعد.');
+            }
+            return ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: reviews.length > 2 ? 2 : reviews.length, // Show max 2 reviews
+              itemBuilder: (context, index) {
+                final review = reviews[index];
+                return Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppTheme.lightGray,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(review.authorName, style: textTheme.titleLarge),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                           const Icon(LucideIcons.star, color: Colors.amber, size: 16),
-                           const SizedBox(width: 4),
-                           Text(review.rating.toStringAsFixed(1), style: textTheme.titleLarge),
+                          Text(review.authorName, style: textTheme.titleLarge),
+                          Row(
+                            children: [
+                              const Icon(LucideIcons.star, color: Colors.amber, size: 16),
+                              const SizedBox(width: 4),
+                              Text(review.rating.toStringAsFixed(1), style: textTheme.titleLarge),
+                            ],
+                          ),
                         ],
                       ),
+                      const SizedBox(height: 4),
+                      Text(review.comment, style: textTheme.bodyMedium),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(review.comment, style: textTheme.bodyMedium),
-                ],
-              ),
+                );
+              },
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
             );
           },
-          separatorBuilder: (context, index) => const SizedBox(height: 8),
-        )
+        ),
       ],
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, WidgetRef ref, String professionalId) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       decoration: BoxDecoration(
         color: AppTheme.surface,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)
-        ],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)],
       ),
       child: Row(
         children: [
           Expanded(
-            flex: 1,
             child: OutlinedButton(
               child: const Text('تواصل'),
-              onPressed: () {},
-            ),
-          ),
-          const SizedBox(width: 12),
-           Expanded(
-            flex: 1,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-              child: const Text('محمد'),
-              onPressed: () {},
+              onPressed: () async {
+                try {
+                  final chatId = await ref.read(chatActionsProvider).findOrCreateChat(professionalId);
+                  context.push('/home/chat/$chatId');
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل بدء المحادثة: $e')));
+                }
+              },
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            flex: 1,
             child: ElevatedButton(
               child: const Text('طلب عرض سعر'),
-              onPressed: () {},
+              onPressed: () {
+                 ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('هذه الميزة غير متوفرة بعد.')),
+                );
+              },
             ),
           ),
         ],

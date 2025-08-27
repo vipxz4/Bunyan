@@ -15,22 +15,29 @@ class MyProjectsListScreen extends ConsumerWidget {
         title: 'مشاريعي وطلباتي',
         showBackButton: false,
       ),
-      body: projects.isEmpty
-          ? const Center(child: Text('لا توجد مشاريع أو طلبات حالياً.'))
-          : ListView.separated(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: projects.length,
-              itemBuilder: (context, index) {
-                final project = projects[index];
-                return ProjectCard(
-                  project: project,
-                  onTap: () {
-                    // TODO: Navigate to project details
-                  },
-                );
-              },
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-            ),
+      body: projects.when(
+        data: (projectList) {
+          if (projectList.isEmpty) {
+            return const Center(child: Text('لا توجد مشاريع أو طلبات حالياً.'));
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: projectList.length,
+            itemBuilder: (context, index) {
+              final project = projectList[index];
+              return ProjectCard(
+                project: project,
+                onTap: () {
+                  // TODO: Navigate to project details
+                },
+              );
+            },
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text('حدث خطأ أثناء تحميل المشاريع')),
+      ),
     );
   }
 }

@@ -66,12 +66,36 @@ class MaterialsSearchScreen extends ConsumerWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  _CategoryCard(icon: LucideIcons.gem, label: 'إسمنت ورمل', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.truck, label: 'طوب وبلك', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.blinds, label: 'أخشاب', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.hammer, label: 'حديد', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.paintBucket, label: 'دهانات', onTap: () {}),
-                  _CategoryCard(icon: LucideIcons.pill, label: 'أدوات', onTap: () {}),
+                  _CategoryCard(
+                      icon: LucideIcons.gem,
+                      label: 'إسمنت ورمل',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.truck,
+                      label: 'طوب وبلك',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.blinds,
+                      label: 'أخشاب',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.hammer,
+                      label: 'حديد',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.paintBucket,
+                      label: 'دهانات',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
+                  _CategoryCard(
+                      icon: LucideIcons.pill,
+                      label: 'أدوات',
+                      onTap: () =>
+                          context.push('/home/materials-search-results')),
                 ],
               ),
             ),
@@ -80,19 +104,23 @@ class MaterialsSearchScreen extends ConsumerWidget {
               onViewAll: () {},
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
             ),
-            HorizontalCardCarousel(
-              height: 320,
-              itemCount: featuredProducts.length,
-              itemBuilder: (context, index) {
-                final product = featuredProducts[index];
-                return SizedBox(
-                  width: 200,
-                  child: ProductCard(
-                    product: product,
-                    onTap: () => context.push('/home/product-details/${product.id}'),
-                  ),
-                );
-              },
+            featuredProducts.when(
+              data: (products) => HorizontalCardCarousel(
+                height: 320,
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return SizedBox(
+                    width: 200,
+                    child: ProductCard(
+                      product: product,
+                      onTap: () => context.push('/home/product-details/${product.id}'),
+                    ),
+                  );
+                },
+              ),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Center(child: Text('حدث خطأ أثناء تحميل المنتجات')),
             ),
             const SizedBox(height: 24),
             Padding(

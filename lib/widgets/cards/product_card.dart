@@ -1,6 +1,7 @@
 import 'package:bonyan/core/app_theme.dart';
 import 'package:bonyan/models/models.dart';
-import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/providers/cart_provider.dart'; // Import the file above
+import 'package:bonyan/providers/data_providers.dart'; // For user/actions providers
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,24 +28,54 @@ class _ProductCardState extends ConsumerState<ProductCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final user = ref.watch(userDetailsProvider).asData?.value;
+    final isFavorite =
+        user?.favoriteProductIds.contains(widget.product.id) ?? false;
+
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          InkWell(
-            onTap: widget.onTap,
-            child: AspectRatio(
-              aspectRatio: 16 / 10.5,
-              child: CachedNetworkImage(
-                imageUrl: widget.product.imageUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) =>
-                    const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) =>
-                    const Center(child: Icon(LucideIcons.imageOff)),
+          Stack(
+            children: [
+              InkWell(
+                onTap: widget.onTap,
+                child: AspectRatio(
+                  aspectRatio: 16 / 10.5,
+                  child: CachedNetworkImage(
+                    imageUrl: widget.product.imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Center(child: Icon(LucideIcons.imageOff)),
+                  ),
+                ),
               ),
-            ),
+              Positioned(
+                top: 4,
+                right: 4,
+                child: Card(
+                  shape: const CircleBorder(),
+                  color: Colors.black.withOpacity(0.3),
+                  elevation: 0,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    icon: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.redAccent : Colors.white,
+                      size: 22,
+                    ),
+                    onPressed: () {
+                      ref
+                          .read(userActionsProvider)
+                          .toggleProductFavorite(widget.product.id);
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
           Expanded(
             child: Padding(
@@ -91,7 +122,7 @@ class _ProductCardState extends ConsumerState<ProductCard> {
                           style: theme.textTheme.titleMedium,
                         ),
                       ),
-                       SizedBox(
+                      SizedBox(
                         height: 30,
                         width: 30,
                         child: OutlinedButton(
@@ -111,17 +142,19 @@ class _ProductCardState extends ConsumerState<ProductCard> {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                         textStyle: theme.textTheme.labelLarge?.copyWith(fontSize: 14)
-                      ),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          textStyle: theme.textTheme.labelLarge
+                              ?.copyWith(fontSize: 14)),
                       onPressed: () {
+                        // THIS IS THE FIX: Call the correct provider
                         ref
-                            .read(cartProvider.notifier)
+                            .read(cartActionsProvider)
                             .addItem(widget.product, _quantity);
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content:
-                                Text('تمت إضافة ${widget.product.name} إلى السلة'),
+                            content: Text(
+                                'تمت إضافة ${widget.product.name} إلى السلة'),
                             duration: const Duration(seconds: 2),
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(

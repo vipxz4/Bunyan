@@ -4,6 +4,7 @@ import 'package:bonyan/widgets/widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class CheckoutSummaryScreen extends ConsumerWidget {
   const CheckoutSummaryScreen({super.key});
@@ -42,9 +43,7 @@ class CheckoutSummaryScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
         child: PrimaryButton(
           text: 'تأكيد والانتقال لتمويل الضمان',
-          onPressed: () {
-            // TODO: Navigate to guarantee funding screen
-          },
+          onPressed: () => context.push('/home/checkout-summary/guarantee-funding'),
         ),
       ),
     );
@@ -71,42 +70,46 @@ class CheckoutSummaryScreen extends ConsumerWidget {
   }
 
   Widget _buildProductsList(WidgetRef ref) {
-    final cartItems = ref.watch(cartProvider);
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: cartItems.length,
-      itemBuilder: (context, index) {
-        final item = cartItems[index];
-        return Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: CachedNetworkImage(
-                imageUrl: item.product.imageUrl,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
+    final cartItemsAsync = ref.watch(cartProvider);
+    return cartItemsAsync.when(
+      data: (cartItems) => ListView.separated(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: cartItems.length,
+        itemBuilder: (context, index) {
+          final item = cartItems[index];
+          return Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: CachedNetworkImage(
+                  imageUrl: item.product.imageUrl,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(item.product.name,
-                      style: Theme.of(context).textTheme.titleLarge),
-                  Text('الكمية: ${item.quantity}',
-                      style: Theme.of(context).textTheme.bodyMedium),
-                ],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item.product.name,
+                        style: Theme.of(context).textTheme.titleLarge),
+                    Text('الكمية: ${item.quantity}',
+                        style: Theme.of(context).textTheme.bodyMedium),
+                  ],
+                ),
               ),
-            ),
-            Text('${(item.totalPrice).toStringAsFixed(0)} ريال',
-                style: Theme.of(context).textTheme.titleLarge),
-          ],
-        );
-      },
-      separatorBuilder: (context, index) => const SizedBox(height: 16),
+              Text('${(item.totalPrice).toStringAsFixed(0)} ريال',
+                  style: Theme.of(context).textTheme.titleLarge),
+            ],
+          );
+        },
+        separatorBuilder: (context, index) => const SizedBox(height: 16),
+      ),
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stack) => Center(child: Text('حدث خطأ أثناء تحميل المنتجات')),
     );
   }
 

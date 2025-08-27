@@ -1,6 +1,7 @@
 import 'package:bonyan/core/app_theme.dart';
 import 'package:bonyan/models/notification_model.dart';
 import 'package:bonyan/providers/providers.dart';
+import 'package:bonyan/widgets/common/error_display_widget.dart';
 import 'package:bonyan/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,36 +13,50 @@ class NotificationsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final notifications = ref.watch(notificationsProvider);
+    final notificationsAsyncValue = ref.watch(notificationsProvider);
     timeago.setLocaleMessages('ar', timeago.ArMessages());
 
     return Scaffold(
       appBar: const ScreenHeader(title: 'الإشعارات'),
-      body: notifications.isEmpty
-          ? const Center(child: Text('لا توجد إشعارات حالياً.'))
-          : ListView.separated(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: notifications.length,
-              itemBuilder: (context, index) {
-                final notification = notifications[index];
-                return _NotificationCard(notification: notification);
-              },
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
-            ),
+      body: notificationsAsyncValue.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => ErrorDisplayWidget(errorMessage: err.toString()),
+        data: (notifications) {
+          if (notifications.isEmpty) {
+            return const Center(child: Text('لا توجد إشعارات حالياً.'));
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(16.0),
+            itemCount: notifications.length,
+            itemBuilder: (context, index) {
+              final notification = notifications[index];
+              return _NotificationCard(notification: notification);
+            },
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
+          );
+        },
+      ),
     );
   }
 }
 
-class _NotificationCard extends StatelessWidget {
+class _NotificationCard extends ConsumerWidget {
   const _NotificationCard({required this.notification});
 
   final NotificationModel notification;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final textTheme = Theme.of(context).textTheme;
     return InkWell(
-      onTap: () => context.push('/home/notifications/${notification.id}'),
+      onTap: () {
+        // Mark as read when tapped
+        if (!notification.isRead) {
+          ref.read(notificationActionsProvider).markAsRead(notification.id);
+        }
+        // Navigate to details
+        context.push('/home/notifications/${notification.id}');
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),

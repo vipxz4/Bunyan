@@ -60,16 +60,20 @@ class ProfessionalSearchScreen extends ConsumerWidget {
               child: Text('أعلى تقييماً', style: textTheme.headlineSmall),
             ),
             const SizedBox(height: 16),
-            ListView.separated(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              itemCount: topRated.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) => ProfessionalCard(
-                professional: topRated[index],
-                onTap: () => context.push('/home/professional-profile/${topRated[index].id}'),
+            topRated.when(
+              data: (professionals) => ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                itemCount: professionals.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) => ProfessionalCard(
+                  professional: professionals[index],
+                  onTap: () => context.push('/home/professional-profile/${professionals[index].id}'),
+                ),
+                separatorBuilder: (context, index) => const SizedBox(height: 12),
               ),
-              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Center(child: Text('حدث خطأ أثناء تحميل المهنيين')),
             ),
             const SizedBox(height: 24),
             Padding(

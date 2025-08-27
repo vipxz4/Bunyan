@@ -27,10 +27,12 @@ dependencies:
   # Utility Packages
   intl: ^0.20.2        # عدّل النسخة لتتوافق مع flutter_localizations
   timeago: ^3.6.1
-  collection: ^1.18.0
-  firebase_core: ^4.0.0
-  lucide_icons: ^0.257.0
-  google_fonts: ^6.3.0
+  collection: 
+  firebase_core: 
+  firebase_auth: 
+  cloud_firestore: 
+  lucide_icons: 
+  google_fonts: 
 
 dev_dependencies:
   flutter_test:
