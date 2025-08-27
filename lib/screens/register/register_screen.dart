@@ -1,5 +1,7 @@
 import 'package:bonyan/services/auth_service.dart';
 import 'package:bonyan/utils/error_handler.dart';
+import 'package:bonyan/utils/snackbar_helper.dart';
+import 'package:bonyan/utils/validators.dart';
 import 'package:bonyan/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -38,16 +40,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedRole == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء اختيار دورك الأساسي.')),
-      );
+      showErrorSnackBar(context, 'الرجاء اختيار دورك الأساسي.');
       return;
     }
 
     if (!_termsAccepted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء الموافقة على الشروط والأحكام.')),
-      );
+      showErrorSnackBar(context, 'الرجاء الموافقة على الشروط والأحكام.');
       return;
     }
 
@@ -66,22 +64,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 uid: userCredential.user!.uid,
                 fullName: _nameController.text,
                 email: _emailController.text,
-                role: _selectedRole ?? 'عميل', // Default role
+                role: _selectedRole!, // Role is already validated to be non-null
               );
+
+          if (mounted) {
+            // Navigate to the profile completion screen
+            context.go('/complete-profile', extra: _selectedRole);
+          }
         }
-        // On success, the auth state listener in the router should handle navigation.
       } on FirebaseAuthException catch (e) {
         if (mounted) {
           final errorMessage = handleAuthException(e);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMessage)),
-          );
+          showErrorSnackBar(context, errorMessage);
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('فشل إنشاء المستخدم: ${e.toString()}')),
-          );
+          showErrorSnackBar(context, 'فشل إنشاء المستخدم: ${e.toString()}');
         }
       } finally {
         if (mounted) {
@@ -107,7 +105,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 hintText: 'ادخل اسمك الكامل',
                 prefixIcon: LucideIcons.user,
                 validator: (value) =>
-                    value!.isEmpty ? 'الرجاء إدخال الاسم الكامل' : null,
+                    Validators.validateNotEmpty(value, 'الاسم الكامل'),
               ),
               const SizedBox(height: 20),
               CustomTextField(
@@ -116,8 +114,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 hintText: 'example@email.com',
                 keyboardType: TextInputType.emailAddress,
                 prefixIcon: LucideIcons.mail,
-                validator: (value) =>
-                    value!.isEmpty ? 'الرجاء إدخال البريد الإلكتروني' : null,
+                validator: Validators.validateEmail,
               ),
               const SizedBox(height: 20),
               CustomTextField(
@@ -126,8 +123,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 hintText: 'اختر كلمة مرور قوية',
                 isPassword: true,
                 prefixIcon: LucideIcons.lock,
-                validator: (value) =>
-                    value!.length < 6 ? 'كلمة المرور قصيرة جداً' : null,
+                validator: Validators.validatePassword,
               ),
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(

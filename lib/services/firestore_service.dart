@@ -24,20 +24,32 @@ class FirestoreService {
     required Map<String, dynamic> data,
     bool merge = false,
   }) async {
-    final reference = _firestore.doc(path);
-    await reference.set(data, SetOptions(merge: merge));
+    try {
+      final reference = _firestore.doc(path);
+      await reference.set(data, SetOptions(merge: merge));
+    } on FirebaseException catch (e) {
+      throw Exception('Error setting data: ${e.message}');
+    }
   }
 
   // Create a new document with an auto-generated ID
   Future<DocumentReference<Map<String, dynamic>>> addData(
       Map<String, dynamic> data) async {
-    return _collection.add(data);
+    try {
+      return _collection.add(data);
+    } on FirebaseException catch (e) {
+      throw Exception('Error adding data: ${e.message}');
+    }
   }
 
   // Delete a document
   Future<void> deleteData(String path) async {
-    final reference = _firestore.doc(path);
-    await reference.delete();
+    try {
+      final reference = _firestore.doc(path);
+      await reference.delete();
+    } on FirebaseException catch (e) {
+      throw Exception('Error deleting data: ${e.message}');
+    }
   }
 
   // Get a stream of a single document
@@ -45,9 +57,18 @@ class FirestoreService {
     required String path,
     required T Function(Map<String, dynamic>? data, String documentID) builder,
   }) {
-    final reference = _firestore.doc(path);
+    final reference = _collection.doc(path);
     final snapshots = reference.snapshots();
-    return snapshots.map((snapshot) => builder(snapshot.data(), snapshot.id));
+    return snapshots.map((snapshot) {
+      // Explicitly handle the case where the document does not exist.
+      if (!snapshot.exists) {
+        return builder(null, snapshot.id);
+      }
+      return builder(snapshot.data(), snapshot.id);
+    }).handleError((error) {
+      // Re-throw the error with more context.
+      throw Exception('Error in document stream for path $path: $error');
+    });
   }
 
   // Get a stream of a collection
@@ -63,14 +84,22 @@ class FirestoreService {
     }
     final snapshots = query.snapshots();
     return snapshots.map((snapshot) {
-      final result = snapshot.docs
-          .map((snapshot) => builder(snapshot.data(), snapshot.id))
-          .where((value) => value != null)
-          .toList();
-      if (sort != null) {
-        result.sort(sort);
+      try {
+        final result = snapshot.docs
+            .map((snapshot) => builder(snapshot.data(), snapshot.id))
+            .where((value) => value != null)
+            .toList();
+        if (sort != null) {
+          result.sort(sort);
+        }
+        return result;
+      } catch (e) {
+        // Errors inside the builder function should be caught.
+        throw Exception('Error mapping collection stream: $e');
       }
-      return result;
+    }).handleError((error) {
+      // Handles errors from the stream itself (e.g., permissions)
+      throw Exception('Error in collection stream: $error');
     });
   }
 
@@ -79,9 +108,13 @@ class FirestoreService {
     required String path,
     required T Function(Map<String, dynamic>? data, String documentID) builder,
   }) async {
-    final reference = _firestore.doc(path);
-    final snapshot = await reference.get();
-    return builder(snapshot.data(), snapshot.id);
+    try {
+      final reference = _collection.doc(path);
+      final snapshot = await reference.get();
+      return builder(snapshot.data(), snapshot.id);
+    } on FirebaseException catch (e) {
+      throw Exception('Error getting document: ${e.message}');
+    }
   }
 
   // Get a collection of documents
@@ -91,18 +124,22 @@ class FirestoreService {
         queryBuilder,
     int Function(T lhs, T rhs)? sort,
   }) async {
-    Query<Map<String, dynamic>> query = _collection;
-    if (queryBuilder != null) {
-      query = queryBuilder(query);
+    try {
+      Query<Map<String, dynamic>> query = _collection;
+      if (queryBuilder != null) {
+        query = queryBuilder(query);
+      }
+      final snapshot = await query.get();
+      final result = snapshot.docs
+          .map((snapshot) => builder(snapshot.data(), snapshot.id))
+          .where((value) => value != null)
+          .toList();
+      if (sort != null) {
+        result.sort(sort);
+      }
+      return result;
+    } on FirebaseException catch (e) {
+      throw Exception('Error getting collection: ${e.message}');
     }
-    final snapshot = await query.get();
-    final result = snapshot.docs
-        .map((snapshot) => builder(snapshot.data(), snapshot.id))
-        .where((value) => value != null)
-        .toList();
-    if (sort != null) {
-      result.sort(sort);
-    }
-    return result;
   }
 }

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "46750310630",
-    "project_id": "bonyan-b8e2e",
-    "storage_bucket": "bonyan-b8e2e.firebasestorage.app"
+    "project_number": "950810888733",
+    "project_id": "bonyan-217a2",
+    "storage_bucket": "bonyan-217a2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:46750310630:android:396788623f185f07b7db27",
+        "mobilesdk_app_id": "1:950810888733:android:c0015d1c2550df9f8794f4",
         "android_client_info": {
           "package_name": "com.bonyanapp.bonyan"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCnbzHEfYXeljIZNCEbaNdkgAJqC993TpE"
+          "current_key": "AIzaSyAA3V9_a8H-8RkMCrwl2WhdozP2j_X0lkI"
         }
       ],
       "services": {

@@ -4,6 +4,7 @@ import 'package:bonyan/screens/login/login_screen.dart';
 import 'package:bonyan/screens/my_projects_list/my_projects_list_screen.dart';
 import 'package:bonyan/screens/onboarding/onboarding_screen.dart';
 import 'package:bonyan/screens/otp/otp_screen.dart';
+import 'package:bonyan/screens/register/complete_profile_screen.dart';
 import 'package:bonyan/screens/register/register_screen.dart';
 import 'package:bonyan/screens/materials_search/materials_search_screen.dart';
 import 'package:bonyan/screens/general_search_results/general_search_results_screen.dart';
@@ -41,6 +42,7 @@ import 'package:bonyan/screens/forgot_password/forgot_password_screen.dart';
 import 'package:bonyan/screens/splash/splash_screen.dart';
 import 'package:bonyan/screens/supplier_profile/supplier_profile_screen.dart';
 import 'package:bonyan/services/auth_service.dart';
+import 'package:bonyan/providers/data_providers.dart';
 import 'package:bonyan/widgets/navigation/scaffold_with_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,28 +59,54 @@ final _shellNavigatorKeyForAccount =
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateChangesProvider);
+  // Also watch userDetailsProvider to make decisions based on profile state.
+  final userDetails = ref.watch(userDetailsProvider);
 
   return GoRouter(
     initialLocation: '/splash',
     navigatorKey: _rootNavigatorKey,
     redirect: (context, state) {
-      // If the user is not logged in, they can only access the auth pages.
       final isLoggedIn = authState.value != null;
-      final location = state.uri.toString();
-      final isAuthRoute = location == '/login' ||
-          location == '/register' ||
-          location == '/forgot-password';
-      final isPublicRoute =
-          isAuthRoute || location == '/splash' || location == '/onboarding';
+      final location = state.uri.path;
 
+      // Define which routes are part of the authentication flow
+      final isAuthFlowRoute = location == '/login' ||
+          location == '/register' ||
+          location == '/forgot-password' ||
+          location == '/complete-profile';
+
+      // Define routes that are publicly accessible
+      final isPublicRoute =
+          isAuthFlowRoute || location == '/splash' || location == '/onboarding';
+
+      // If user is not logged in and not on a public route, redirect to login
       if (!isLoggedIn && !isPublicRoute) {
         return '/login';
       }
-      if (isLoggedIn && isAuthRoute) {
-        return '/home';
+
+      // If user is logged in, perform additional checks
+      if (isLoggedIn) {
+        // While user details are loading, don't redirect anywhere.
+        if (userDetails.isLoading) {
+          return null;
+        }
+
+        final user = userDetails.asData?.value;
+        final isProfileComplete = user?.isProfileComplete ?? false;
+
+        // If profile is not complete, redirect to the complete-profile screen
+        if (!isProfileComplete && location != '/complete-profile') {
+          return '/complete-profile';
+        }
+
+        // If profile IS complete, but user is trying to access auth flow routes,
+        // redirect them to the home screen.
+        if (isProfileComplete && isAuthFlowRoute) {
+          return '/home';
+        }
       }
 
-      return null; // No redirect needed.
+      return null; // No redirect needed
     },
     routes: [
       GoRoute(
@@ -98,6 +126,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/register',
         name: 'register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+       GoRoute(
+        path: '/complete-profile',
+        name: 'complete-profile',
+        builder: (context, state) {
+          final role = state.extra as String? ?? 'عميل'; // Default to client
+          return CompleteProfileScreen(role: role);
+        },
       ),
       GoRoute(
         path: '/forgot-password',

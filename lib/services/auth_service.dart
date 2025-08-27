@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:bonyan/utils/error_handler.dart';
 
 class AuthService {
   AuthService(this._auth, this._firestore);
@@ -19,9 +20,7 @@ class AuthService {
       );
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      // Could be 'weak-password', 'email-already-in-use', etc.
-      // In a real app, you would handle these errors more gracefully.
-      throw Exception('Failed to sign up: ${e.message}');
+      throw Exception(handleAuthException(e));
     }
   }
 
@@ -34,8 +33,7 @@ class AuthService {
       );
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      // Could be 'user-not-found', 'wrong-password', etc.
-      throw Exception('Failed to sign in: ${e.message}');
+      throw Exception(handleAuthException(e));
     }
   }
 
@@ -50,16 +48,27 @@ class AuthService {
     required String role,
   }) async {
     try {
+      // Create a document with initial fields, initializing all possible
+      // fields to a default state to ensure type safety on reads.
       await _firestore.collection('users').doc(uid).set({
-        'uid': uid,
         'fullName': fullName,
         'email': email,
         'role': role,
         'createdAt': FieldValue.serverTimestamp(),
+        // Initialize other fields to their default/empty state.
+        'phoneNumber': null,
+        'avatarUrl': null,
+        'favoriteProductIds': [],
+        'favoriteProfessionalIds': [],
+        'companyName': null,
+        'address': null,
+        'specialization': null,
+        'yearsOfExperience': null,
+        'isProfileComplete': false, // Set to false on creation
       });
-    } catch (e) {
+    } on FirebaseException catch (e) {
       // In a real app, handle this error more gracefully
-      throw Exception('Failed to create user document: $e');
+      throw Exception('Failed to create user document: ${e.message}');
     }
   }
 }
