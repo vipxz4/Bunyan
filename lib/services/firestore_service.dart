@@ -59,8 +59,15 @@ class FirestoreService {
   }) {
     final reference = _firestore.doc(path);
     final snapshots = reference.snapshots();
-    return snapshots.map((snapshot) => builder(snapshot.data(), snapshot.id)).handleError((error) {
-      throw Exception('Error in document stream: $error');
+    return snapshots.map((snapshot) {
+      // Explicitly handle the case where the document does not exist.
+      if (!snapshot.exists) {
+        return builder(null, snapshot.id);
+      }
+      return builder(snapshot.data(), snapshot.id);
+    }).handleError((error) {
+      // Re-throw the error with more context.
+      throw Exception('Error in document stream for path $path: $error');
     });
   }
 
