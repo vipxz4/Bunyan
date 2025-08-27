@@ -1,8 +1,6 @@
 import 'package:bonyan/core/app_theme.dart';
 import 'package:bonyan/models/user_model.dart';
 import 'package:bonyan/providers/providers.dart';
-import 'package:bonyan/services/auth_service.dart';
-import 'package:bonyan/widgets/common/error_display_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,103 +12,87 @@ class AccountScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userAsyncValue = ref.watch(userDetailsProvider);
-
+    final user = ref.watch(userProvider);
     return Scaffold(
-      body: userAsyncValue.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => ErrorDisplayWidget(errorMessage: err.toString()),
-        data: (user) {
-          if (user == null) {
-            // This can happen briefly during logout or if the user doc doesn't exist
-            return const Center(child: Text('المستخدم غير مسجل دخول.'));
-          }
-          return CustomScrollView(
-            slivers: [
-              _buildHeader(context, user),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      _buildMenuSection([
-                        _AccountMenuItem(
-                            icon: LucideIcons.user,
-                            text: 'تعديل الملف الشخصي',
-                            onTap: () => context.push('/account/edit-profile')),
-                        _AccountMenuItem(
-                            icon: LucideIcons.shoppingBag,
-                            text: 'طلبات الشراء',
-                            onTap: () => context.push('/account/purchase-orders')),
-                        _AccountMenuItem(
-                            icon: LucideIcons.mailQuestion,
-                            text: 'طلبات عروض الأسعار',
-                            onTap: () =>
-                                context.push('/account/quotation-requests')),
-                        _AccountMenuItem(
-                            icon: LucideIcons.fileCheck2,
-                            text: 'العقود المحفوظة',
-                            onTap: () =>
-                                context.push('/account/saved-contracts')),
-                        _AccountMenuItem(
-                            icon: LucideIcons.heart,
-                            text: 'المفضلة',
-                            onTap: () => context.push('/home/favorites')),
-                        _AccountMenuItem(
-                            icon: LucideIcons.star,
-                            text: 'تقييماتي',
-                            onTap: () => context.push('/account/my-ratings')),
-                      ]),
-                      const SizedBox(height: 16),
-                      _buildMenuSection([
-                        _AccountMenuItem(
-                            icon: LucideIcons.settings,
-                            text: 'الإعدادات',
-                            onTap: () => context.push('/account/settings')),
-                        _AccountMenuItem(
-                            icon: LucideIcons.helpCircle,
-                            text: 'المساعدة والدعم',
-                            onTap: () =>
-                                context.push('/account/help-and-support')),
-                      ]),
-                      const SizedBox(height: 16),
-                      _buildMenuSection([
-                        _AccountMenuItem(
-                            icon: LucideIcons.briefcase,
-                            text: 'لوحة تحكم مقدم الخدمة',
-                            color: Colors.green.shade700,
-                            onTap: () => context
-                                .push('/account/service-provider-dashboard')),
-                        _AccountMenuItem(
-                            icon: LucideIcons.store,
-                            text: 'لوحة تحكم المورد',
-                            color: Colors.blue.shade700,
-                            onTap: () =>
-                                context.push('/account/supplier-dashboard')),
-                      ]),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: TextButton(
-                          onPressed: () => _showLogoutDialog(context, ref),
-                          style: TextButton.styleFrom(
-                            backgroundColor: AppTheme.red.withOpacity(0.1),
-                            foregroundColor: AppTheme.red,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: const Text('تسجيل الخروج',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              )
-            ],
-          );
-        },
+      body: CustomScrollView(
+        slivers: [
+          _buildHeader(context, user),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  _buildMenuSection([
+                    _AccountMenuItem(
+                        icon: LucideIcons.user,
+                        text: 'تعديل الملف الشخصي',
+                        onTap: () => context.push('/account/edit-profile')),
+                    _AccountMenuItem(
+                        icon: LucideIcons.shoppingBag,
+                        text: 'طلبات الشراء',
+                        onTap: () => context.push('/account/purchase-orders')),
+                    _AccountMenuItem(
+                        icon: LucideIcons.mailQuestion,
+                        text: 'طلبات عروض الأسعار',
+                        onTap: () => context.push('/account/quotation-requests')),
+                    _AccountMenuItem(
+                        icon: LucideIcons.fileCheck2,
+                        text: 'العقود المحفوظة',
+                        onTap: () => context.push('/account/saved-contracts')),
+                    _AccountMenuItem(
+                        icon: LucideIcons.heart,
+                        text: 'المفضلة',
+                        onTap: () => context.push('/home/favorites')),
+                    _AccountMenuItem(
+                        icon: LucideIcons.star,
+                        text: 'تقييماتي',
+                        onTap: () => context.push('/account/my-ratings')),
+                  ]),
+                  const SizedBox(height: 16),
+                  _buildMenuSection([
+                    _AccountMenuItem(
+                        icon: LucideIcons.settings,
+                        text: 'الإعدادات',
+                        onTap: () => context.push('/account/settings')),
+                    _AccountMenuItem(
+                        icon: LucideIcons.helpCircle,
+                        text: 'المساعدة والدعم',
+                        onTap: () => context.push('/account/help-and-support')),
+                  ]),
+                  const SizedBox(height: 16),
+                  _buildMenuSection([
+                    _AccountMenuItem(
+                        icon: LucideIcons.briefcase,
+                        text: 'لوحة تحكم مقدم الخدمة',
+                        color: Colors.green.shade700,
+                        onTap: () =>
+                            context.push('/account/service-provider-dashboard')),
+                    _AccountMenuItem(
+                        icon: LucideIcons.store,
+                        text: 'لوحة تحكم المورد',
+                        color: Colors.blue.shade700,
+                        onTap: () => context.push('/account/supplier-dashboard')),
+                  ]),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () => _showLogoutDialog(context),
+                      style: TextButton.styleFrom(
+                        backgroundColor: AppTheme.red.withOpacity(0.1),
+                        foregroundColor: AppTheme.red,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('تسجيل الخروج', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -125,13 +107,12 @@ class AccountScreen extends ConsumerWidget {
         background: Stack(
           fit: StackFit.expand,
           children: [
-            if (user.avatarUrl != null && user.avatarUrl!.isNotEmpty)
-              Image.network(
-                user.avatarUrl!,
-                fit: BoxFit.cover,
-                color: Colors.black.withOpacity(0.4),
-                colorBlendMode: BlendMode.darken,
-              ),
+            Image.network(
+              'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1770&auto=format&fit=crop',
+              fit: BoxFit.cover,
+              color: Colors.black.withOpacity(0.4),
+              colorBlendMode: BlendMode.darken,
+            ),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -145,18 +126,12 @@ class AccountScreen extends ConsumerWidget {
                       backgroundImage: user.avatarUrl != null
                           ? CachedNetworkImageProvider(user.avatarUrl!)
                           : null,
-                      child: user.avatarUrl == null
-                          ? const Icon(LucideIcons.user, size: 40)
-                          : null,
+                      child: user.avatarUrl == null ? const Icon(LucideIcons.user, size: 40) : null,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text(user.fullName,
-                      style:
-                          textTheme.headlineSmall?.copyWith(color: Colors.white)),
-                  Text(user.phoneNumber ?? '',
-                      style:
-                          textTheme.bodyMedium?.copyWith(color: Colors.white70)),
+                  Text(user.fullName, style: textTheme.headlineSmall?.copyWith(color: Colors.white)),
+                  Text(user.phoneNumber, style: textTheme.bodyMedium?.copyWith(color: Colors.white70)),
                 ],
               ),
             )
@@ -169,28 +144,28 @@ class AccountScreen extends ConsumerWidget {
   Widget _buildMenuSection(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            )
-          ]),
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ]
+      ),
       child: Column(
         children: children,
       ),
     );
   }
 
-  Future<void> _showLogoutDialog(BuildContext context, WidgetRef ref) async {
+  Future<void> _showLogoutDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text('تسجيل الخروج'),
           content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
           actions: <Widget>[
@@ -204,9 +179,8 @@ class AccountScreen extends ConsumerWidget {
               style: FilledButton.styleFrom(backgroundColor: AppTheme.red),
               child: const Text('تسجيل الخروج'),
               onPressed: () {
-                ref.read(authServiceProvider).signOut();
-                // The router's redirect logic will handle navigation.
                 Navigator.of(context).pop();
+                context.go('/login');
               },
             ),
           ],
@@ -234,11 +208,8 @@ class _AccountMenuItem extends StatelessWidget {
     final theme = Theme.of(context);
     return ListTile(
       leading: Icon(icon, color: color ?? AppTheme.primary),
-      title: Text(text,
-          style: theme.textTheme.titleMedium
-              ?.copyWith(fontWeight: FontWeight.bold)),
-      trailing:
-          const Icon(LucideIcons.chevronLeft, color: AppTheme.textSecondary),
+      title: Text(text, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+      trailing: const Icon(LucideIcons.chevronLeft, color: AppTheme.textSecondary),
       onTap: onTap,
     );
   }

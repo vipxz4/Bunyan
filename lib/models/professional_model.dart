@@ -30,39 +30,6 @@ class ProfessionalModel {
     required this.portfolioImageUrls,
   });
 
-  factory ProfessionalModel.fromJson(Map<String, dynamic> json, String id) {
-    return ProfessionalModel(
-      id: id,
-      name: json['name'] ?? '',
-      specialty: json['specialty'] ?? '',
-      location: json['location'] ?? '',
-      rating: (json['rating'] ?? 0).toDouble(),
-      reviewCount: json['reviewCount'] ?? 0,
-      avatarUrl: json['avatarUrl'],
-      backgroundUrl: json['backgroundUrl'],
-      isVerified: json['isVerified'] ?? false,
-      acceptsWarrantyPayment: json['acceptsWarrantyPayment'] ?? false,
-      bio: json['bio'] ?? '',
-      portfolioImageUrls: List<String>.from(json['portfolioImageUrls'] ?? []),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'specialty': specialty,
-      'location': location,
-      'rating': rating,
-      'reviewCount': reviewCount,
-      'avatarUrl': avatarUrl,
-      'backgroundUrl': backgroundUrl,
-      'isVerified': isVerified,
-      'acceptsWarrantyPayment': acceptsWarrantyPayment,
-      'bio': bio,
-      'portfolioImageUrls': portfolioImageUrls,
-    };
-  }
-
   ProfessionalModel copyWith({
     String? id,
     String? name,

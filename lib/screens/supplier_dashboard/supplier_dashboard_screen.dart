@@ -1,69 +1,50 @@
-import 'package:bonyan/models/product_model.dart';
-import 'package:bonyan/providers/data_providers.dart';
-import 'package:bonyan/widgets/common/error_display_widget.dart';
 import 'package:bonyan/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
 
-class SupplierDashboardScreen extends ConsumerWidget {
+class SupplierDashboardScreen extends StatelessWidget {
   const SupplierDashboardScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userDetailsProvider).asData?.value;
-    final productsAsyncValue = ref.watch(productsProvider);
-    // In a real app, we'd have providers for orders, ratings, etc.
-    // For now, we'll derive stats from the products provider.
-
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: const ScreenHeader(title: 'لوحة تحكم المورد'),
-      body: productsAsyncValue.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => ErrorDisplayWidget(errorMessage: err.toString()),
-        data: (allProducts) {
-          final myProducts = user != null
-              ? allProducts.where((p) => p.supplierId == user.id).toList()
-              : <ProductModel>[];
-
-          return GridView.count(
-            padding: const EdgeInsets.all(16.0),
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            children: [
-              _DashboardCard(
-                icon: LucideIcons.package,
-                label: 'منتجاتي',
-                value: myProducts.length.toString(),
-                onTap: () =>
-                    context.push('/account/supplier-dashboard/my-products'),
-              ),
-              _DashboardCard(
-                icon: LucideIcons.shoppingCart,
-                label: 'الطلبات الجديدة',
-                value: '0', // Mock: No orders provider yet
-                onTap: () =>
-                    context.push('/account/supplier-dashboard/my-orders'),
-              ),
-              _DashboardCard(
-                icon: LucideIcons.star,
-                label: 'التقييمات',
-                value: 'N/A', // Mock: No ratings provider for suppliers yet
-                onTap: () => context.push('/account/my-ratings'),
-              ),
-              _DashboardCard(
-                icon: LucideIcons.lineChart,
-                label: 'الأرباح',
-                value: 'N/A', // Mock: No earnings provider yet
-                onTap: () {
-                  // TODO: Navigate to earnings screen
-                },
-              ),
-            ],
-          );
-        },
+      body: GridView.count(
+        padding: const EdgeInsets.all(16.0),
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        children: [
+          _DashboardCard(
+            icon: LucideIcons.package,
+            label: 'منتجاتي',
+            value: '150', // Mock data
+            onTap: () => context.push('/account/supplier-dashboard/my-products'),
+          ),
+          _DashboardCard(
+            icon: LucideIcons.shoppingCart,
+            label: 'الطلبات الجديدة',
+            value: '12', // Mock data
+            onTap: () => context.push('/account/supplier-dashboard/my-orders'),
+          ),
+          _DashboardCard(
+            icon: LucideIcons.star,
+            label: 'التقييمات',
+            value: '4.8', // Mock data
+            onTap: () {
+              // TODO: Navigate to ratings screen
+            },
+          ),
+          _DashboardCard(
+            icon: LucideIcons.lineChart,
+            label: 'الأرباح',
+            value: '1.2M ريال', // Mock data
+            onTap: () {
+              // TODO: Navigate to earnings screen
+            },
+          ),
+        ],
       ),
     );
   }

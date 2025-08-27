@@ -1,7 +1,6 @@
 import 'package:bonyan/core/app_theme.dart';
 import 'package:bonyan/models/models.dart';
 import 'package:bonyan/providers/providers.dart';
-import 'package:bonyan/widgets/common/error_display_widget.dart';
 import 'package:bonyan/widgets/widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -14,29 +13,21 @@ class CartScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final cartAsyncValue = ref.watch(cartProvider);
+    final cartItems = ref.watch(cartProvider);
 
     return Scaffold(
       appBar: const ScreenHeader(title: 'سلة التسوق'),
-      body: cartAsyncValue.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => ErrorDisplayWidget(errorMessage: err.toString()),
-        data: (cartItems) {
-          if (cartItems.isEmpty) {
-            return _buildEmptyState(context);
-          }
-          return ListView.separated(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: cartItems.length,
-            itemBuilder: (context, index) {
-              return _CartItemCard(item: cartItems[index]);
-            },
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-          );
-        },
-      ),
-      bottomNavigationBar:
-          cartAsyncValue.asData?.value.isEmpty ?? true ? null : const _SummaryBar(),
+      body: cartItems.isEmpty
+          ? _buildEmptyState(context)
+          : ListView.separated(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: cartItems.length,
+              itemBuilder: (context, index) {
+                return _CartItemCard(item: cartItems[index]);
+              },
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+            ),
+      bottomNavigationBar: cartItems.isEmpty ? null : const _SummaryBar(),
     );
   }
 
@@ -99,17 +90,16 @@ class _CartItemCard extends ConsumerWidget {
                   Row(
                     children: [
                       _buildQuantityButton(context, ref, LucideIcons.minus, () {
-                        ref.read(cartActionsProvider).updateQuantity(
-                            item.product.id, item.quantity - 1);
+                        ref.read(cartProvider.notifier)
+                            .updateQuantity(item.product.id, item.quantity - 1);
                       }),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child:
-                            Text('${item.quantity}', style: textTheme.titleLarge),
+                        child: Text('${item.quantity}', style: textTheme.titleLarge),
                       ),
-                      _buildQuantityButton(context, ref, LucideIcons.plus, () {
-                        ref.read(cartActionsProvider).updateQuantity(
-                            item.product.id, item.quantity + 1);
+                       _buildQuantityButton(context, ref, LucideIcons.plus, () {
+                        ref.read(cartProvider.notifier)
+                            .updateQuantity(item.product.id, item.quantity + 1);
                       }),
                     ],
                   )
@@ -119,7 +109,7 @@ class _CartItemCard extends ConsumerWidget {
             IconButton(
               icon: const Icon(LucideIcons.trash2, color: AppTheme.red),
               onPressed: () =>
-                  ref.read(cartActionsProvider).removeItem(item.product.id),
+                  ref.read(cartProvider.notifier).removeItem(item.product.id),
             )
           ],
         ),

@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:bonyan/widgets/common/error_display_widget.dart';
 
 class ProductDetailsScreen extends ConsumerStatefulWidget {
   const ProductDetailsScreen({super.key, required this.id});
@@ -23,8 +22,6 @@ class ProductDetailsScreen extends ConsumerStatefulWidget {
 class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
   int _quantity = 1;
 
-
-
   @override
   Widget build(BuildContext context) {
     final productAsync = ref.watch(productDetailsProvider(widget.id));
@@ -32,11 +29,9 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
     return productAsync.when(
       data: (product) {
         if (product == null) {
-          return Scaffold(appBar: AppBar(), body: const Center(child: Text('المنتج غير موجود.')));
+          return const Scaffold(body: Center(child: Text('المنتج غير موجود.')));
         }
         final textTheme = Theme.of(context).textTheme;
-        final favoriteProductIds = ref.watch(favoriteProductsProvider);
-        final isFavorite = favoriteProductIds.contains(widget.id);
 
         return Scaffold(
           body: CustomScrollView(
@@ -45,14 +40,23 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                 expandedHeight: 250,
                 pinned: true,
                 actions: [
-                  IconButton(
-                    icon: Icon(isFavorite ? LucideIcons.heart : LucideIcons.heart, color: isFavorite ? AppTheme.red : Colors.white),
-                    onPressed: () => ref.read(userActionsProvider).toggleProductFavorite(widget.id),
-                    style: IconButton.styleFrom(backgroundColor: Colors.black26),
-                  )
+                  Consumer(builder: (context, ref, _) {
+                    final isFavorite = ref.watch(favoritesProvider
+                        .select((favs) => favs.productIds.contains(widget.id)));
+                    return IconButton(
+                      icon: Icon(
+                          isFavorite ? LucideIcons.heart : LucideIcons.heart,
+                          color: isFavorite ? AppTheme.red : Colors.white),
+                      onPressed: () => ref
+                          .read(favoritesProvider.notifier)
+                          .toggleProductFavorite(widget.id),
+                      style:
+                          IconButton.styleFrom(backgroundColor: Colors.black26),
+                    );
+                  })
                 ],
                 leading: IconButton(
-                  icon: const Icon(LucideIcons.arrowLeft, color: Colors.white),
+                  icon: const Icon(LucideIcons.arrowRight, color: Colors.white),
                   onPressed: () => context.pop(),
                   style: IconButton.styleFrom(backgroundColor: Colors.black26),
                 ),
@@ -71,7 +75,11 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
                     children: [
                       Text(product.name, style: textTheme.displaySmall),
                       const SizedBox(height: 8),
-                      Text('${product.price.toStringAsFixed(0)} ريال', style: textTheme.displayMedium?.copyWith(color: AppTheme.primary)),
+                      Text(
+                        '${product.price.toStringAsFixed(0)} ريال',
+                        style: textTheme.displayMedium
+                            ?.copyWith(color: AppTheme.primary),
+                      ),
                       Text('/ ${product.unit}', style: textTheme.headlineSmall),
                       const SizedBox(height: 24),
                       _buildSupplierInfo(context, product, textTheme),
@@ -89,8 +97,9 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
           bottomNavigationBar: _buildAddToCartBar(context, product),
         );
       },
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (err, stack) => Scaffold(appBar: AppBar(), body: ErrorDisplayWidget(errorMessage: err.toString())),
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (err, stack) => Scaffold(body: Center(child: Text('Error: $err'))),
     );
   }
 
@@ -173,17 +182,14 @@ class _ProductDetailsScreenState extends ConsumerState<ProductDetailsScreen> {
             child: PrimaryButton(
               text: 'أضف للسلة',
               icon: LucideIcons.shoppingCart,
-              onPressed: () async {
-                try {
-                  await ref.read(cartActionsProvider).addItem(product, _quantity);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('تمت إضافة ${product.name} إلى السلة')),
-                  );
-                } catch (e) {
-                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('فشل إضافة المنتج: $e')),
-                  );
-                }
+              onPressed: () {
+                ref.read(cartProvider.notifier).addItem(product, _quantity);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('تمت إضافة ${product.name} إلى السلة'),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
               },
             ),
           ),

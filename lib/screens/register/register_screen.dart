@@ -1,92 +1,20 @@
-import 'package:bonyan/services/auth_service.dart';
-import 'package:bonyan/utils/error_handler.dart';
-import 'package:bonyan/utils/snackbar_helper.dart';
-import 'package:bonyan/utils/validators.dart';
 import 'package:bonyan/widgets/widgets.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:bonyan/core/app_theme.dart';
 
-class RegisterScreen extends ConsumerStatefulWidget {
+class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLoading = false;
-
+class _RegisterScreenState extends State<RegisterScreen> {
   String? _selectedRole;
   bool _termsAccepted = false;
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void _register() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    if (_selectedRole == null) {
-      showErrorSnackBar(context, 'الرجاء اختيار دورك الأساسي.');
-      return;
-    }
-
-    if (!_termsAccepted) {
-      showErrorSnackBar(context, 'الرجاء الموافقة على الشروط والأحكام.');
-      return;
-    }
-
-    if (_isLoading) return;
-
-    setState(() => _isLoading = true);
-    try {
-        final userCredential =
-            await ref.read(authServiceProvider).signUpWithEmailAndPassword(
-                  _emailController.text,
-                  _passwordController.text,
-                );
-
-        if (userCredential.user != null) {
-          await ref.read(authServiceProvider).createUserDocument(
-                uid: userCredential.user!.uid,
-                fullName: _nameController.text,
-                email: _emailController.text,
-                role: _selectedRole!, // Role is already validated to be non-null
-              );
-
-          if (mounted) {
-            // Navigate to the profile completion screen
-            context.go('/complete-profile', extra: _selectedRole);
-          }
-        }
-      } on FirebaseAuthException catch (e) {
-        if (mounted) {
-          final errorMessage = handleAuthException(e);
-          showErrorSnackBar(context, errorMessage);
-        }
-      } catch (e) {
-        if (mounted) {
-          showErrorSnackBar(context, 'فشل إنشاء المستخدم: ${e.toString()}');
-        }
-      } finally {
-        if (mounted) {
-          setState(() => _isLoading = false);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,36 +23,66 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       appBar: const ScreenHeader(title: 'إنشاء حساب جديد'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              CustomTextField(
-                controller: _nameController,
-                labelText: 'الاسم الكامل',
-                hintText: 'ادخل اسمك الكامل',
-                prefixIcon: LucideIcons.user,
-                validator: (value) =>
-                    Validators.validateNotEmpty(value, 'الاسم الكامل'),
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: _emailController,
-                labelText: 'البريد الإلكتروني',
-                hintText: 'example@email.com',
-                keyboardType: TextInputType.emailAddress,
-                prefixIcon: LucideIcons.mail,
-                validator: Validators.validateEmail,
-              ),
-              const SizedBox(height: 20),
-              CustomTextField(
-                controller: _passwordController,
-                labelText: 'كلمة المرور',
-                hintText: 'اختر كلمة مرور قوية',
-                isPassword: true,
-                prefixIcon: LucideIcons.lock,
-                validator: Validators.validatePassword,
-              ),
+        child: Column(
+          children: [
+            const CustomTextField(
+              labelText: 'الاسم الكامل',
+              hintText: 'ادخل اسمك الكامل',
+              prefixIcon: LucideIcons.user,
+            ),
+            const SizedBox(height: 20),
+            // A more faithful recreation of the phone input from HTML
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('رقم الهاتف', style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppTheme.lightGray,
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(12),
+                          bottomRight: Radius.circular(12),
+                        ),
+                        border: Border.all(color: Colors.grey.shade300)
+                      ),
+                      child: Text('🇾🇪 +967', style: textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary)),
+                    ),
+                    Expanded(
+                      child: TextFormField(
+                        keyboardType: TextInputType.phone,
+                        decoration: InputDecoration(
+                          hintText: '777 777 777',
+                          // Adjust borders to merge with the country code selector
+                          border: OutlineInputBorder(
+                            borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: const BorderRadius.only(topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderRadius: BorderRadius.only(topLeft: Radius.circular(12), bottomLeft: Radius.circular(12)),
+                            borderSide: BorderSide(color: AppTheme.primary, width: 2),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const CustomTextField(
+              labelText: 'كلمة المرور',
+              hintText: 'اختر كلمة مرور قوية',
+              isPassword: true,
+              prefixIcon: LucideIcons.lock,
+            ),
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
               value: _selectedRole,
@@ -180,8 +138,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             const SizedBox(height: 20),
             PrimaryButton(
               text: 'إنشاء حساب',
-              onPressed: _register,
-              isLoading: _isLoading,
+              onPressed: () => context.push('/otp'),
             ),
             const SizedBox(height: 20),
             Row(
@@ -197,6 +154,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           ],
         ),
       ),
-    ));
+    );
   }
 }

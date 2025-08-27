@@ -13,34 +13,27 @@ class MaterialsSearchResultsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: const ScreenHeader(title: 'نتائج البحث: مواد'),
-      body: results.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('حدث خطأ أثناء جلب النتائج.')),
-        data: (products) {
-          if (products.isEmpty) {
-            return const Center(child: Text('لا توجد منتجات مطابقة للبحث.'));
-          }
-          return GridView.builder(
-            padding: const EdgeInsets.all(16.0),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 0.65,
+      body: results.isEmpty
+          ? const Center(child: Text('لا توجد منتجات مطابقة للبحث.'))
+          : GridView.builder(
+              padding: const EdgeInsets.all(16.0),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.65,
+              ),
+              itemCount: results.length,
+              itemBuilder: (context, index) {
+                final product = results[index];
+                return ProductCard(
+                  product: product,
+                  onTap: () {
+                    context.push('/home/product-details/${product.id}');
+                  },
+                );
+              },
             ),
-            itemCount: products.length,
-            itemBuilder: (context, index) {
-              final product = products[index];
-              return ProductCard(
-                product: product,
-                onTap: () {
-                  context.push('/home/product-details/${product.id}');
-                },
-              );
-            },
-          );
-        },
-      ),
     );
   }
 }

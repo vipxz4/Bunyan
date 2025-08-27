@@ -1,6 +1,7 @@
+import 'package:bonyan/core/app_theme.dart';
 import 'package:bonyan/models/models.dart';
-// Import your new favorites providers file
-import 'package:bonyan/providers/favorites_providers.dart';
+import 'package:bonyan/providers/favorites_provider.dart';
+import 'package:bonyan/providers/providers.dart';
 import 'package:bonyan/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,72 +45,65 @@ class _FavoriteProfessionalsList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watch the new, efficient provider that fetches full ProfessionalModel objects
-    final favoritesAsync = ref.watch(favoriteProfessionalsProvider);
+    final favoriteIds = ref.watch(favoritesProvider).professionalIds;
+    final allProfessionals = ref.watch(recommendedProfessionalsProvider);
+    final favoriteProfessionals = allProfessionals
+        .where((p) => favoriteIds.contains(p.id))
+        .toList();
 
-    // Use .when() to correctly handle loading, error, and data states
-    return favoritesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('حدث خطأ: $err')),
-      data: (favoriteProfessionals) {
-        if (favoriteProfessionals.isEmpty) {
-          return const Center(child: Text('لم تقم بإضافة أي مهنيين للمفضلة.'));
-        }
+    if (favoriteProfessionals.isEmpty) {
+      return const Center(child: Text('لم تقم بإضافة أي مهنيين للمفضلة.'));
+    }
 
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: favoriteProfessionals.length,
-          itemBuilder: (context, index) {
-            final professional = favoriteProfessionals[index];
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12.0),
-              child: ProfessionalCard(
-                professional: professional,
-                onTap: () =>
-                    context.push('/home/professional-profile/${professional.id}'),
-              ),
-            );
-          },
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: favoriteProfessionals.length,
+      itemBuilder: (context, index) {
+        final professional = favoriteProfessionals[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12.0),
+          child: ProfessionalCard(
+            professional: professional,
+            onTap: () =>
+                context.push('/home/professional-profile/${professional.id}'),
+          ),
         );
       },
     );
   }
 }
 
+
+
 class _FavoriteProductsList extends ConsumerWidget {
   const _FavoriteProductsList();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watch the new, efficient provider that fetches full ProductModel objects
-    final favoritesAsync = ref.watch(favoriteProductsProvider);
+    final favoriteIds = ref.watch(favoritesProvider).productIds;
+    final allProducts = ref.watch(productsProvider);
+    final favoriteProducts =
+        allProducts.where((p) => favoriteIds.contains(p.id)).toList();
 
-    return favoritesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => Center(child: Text('حدث خطأ: $err')),
-      data: (favoriteProducts) {
-        // Corrected a small typo in the original text
-        if (favoriteProducts.isEmpty) {
-          return const Center(child: Text('لم تقم بإضافة أي منتجات للمفضلة.'));
-        }
+    if (favoriteProducts.isEmpty) {
+      return const Center(child: Text('لم تقم بإضافة أي منتجات للمفضلة.'));
+    }
 
-        return GridView.builder(
-          padding: const EdgeInsets.all(16.0),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.65,
-          ),
-          itemCount: favoriteProducts.length,
-          itemBuilder: (context, index) {
-            final product = favoriteProducts[index];
-            return ProductCard(
-              product: product,
-              onTap: () {
-                context.push('/home/product-details/${product.id}');
-              },
-            );
+    return GridView.builder(
+      padding: const EdgeInsets.all(16.0),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.65,
+      ),
+      itemCount: favoriteProducts.length,
+      itemBuilder: (context, index) {
+        final product = favoriteProducts[index];
+        return ProductCard(
+          product: product,
+          onTap: () {
+            context.push('/home/product-details/${product.id}');
           },
         );
       },

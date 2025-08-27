@@ -7,59 +7,55 @@ class MyOrdersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This feature is not yet connected to a real data source.
-    // Displaying an empty state is more honest than showing mock data.
-    final orders = [];
+    // Mock data for demonstration
+    final mockOrders = [
+      {
+        'id': 'ORD-987',
+        'customer': 'علي محمد',
+        'total': '150,000 ريال',
+        'status': 'قيد التجهيز'
+      },
+      {
+        'id': 'ORD-986',
+        'customer': 'فاطمة أحمد',
+        'total': '32,500 ريال',
+        'status': 'في انتظار الدفع'
+      },
+      {
+        'id': 'ORD-985',
+        'customer': 'شركة الإعمار',
+        'total': '2,500,000 ريال',
+        'status': 'تم التوصيل'
+      },
+    ];
 
     return Scaffold(
       appBar: const ScreenHeader(title: 'طلباتي'),
-      body: orders.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(LucideIcons.shoppingCart, size: 48, color: Colors.grey),
-                  const SizedBox(height: 16),
-                  Text(
-                    'لا توجد طلبات حالياً.',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'سيتم عرض الطلبات الجديدة هنا عند توفرها.',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16.0),
+        itemCount: mockOrders.length,
+        itemBuilder: (context, index) {
+          final order = mockOrders[index];
+          return Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            child: ListTile(
+              leading: const Icon(LucideIcons.receipt),
+              title: Text('طلب رقم #${order['id']}'),
+              subtitle: Text('العميل: ${order['customer']} - الإجمالي: ${order['total']}'),
+              trailing: Text(
+                order['status'] as String,
+                style: TextStyle(
+                  color: _getStatusColor(order['status'] as String),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16.0),
-              itemCount: orders.length,
-              itemBuilder: (context, index) {
-                // This code will not be reached until a real data source is connected.
-                final order = orders[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ListTile(
-                    leading: const Icon(LucideIcons.receipt),
-                    title: Text('طلب رقم #${order['id']}'),
-                    subtitle: Text(
-                        'العميل: ${order['customer']} - الإجمالي: ${order['total']}'),
-                    trailing: Text(
-                      order['status'] as String,
-                      style: TextStyle(
-                        color: _getStatusColor(order['status'] as String),
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onTap: () {
-                      // TODO: Navigate to order details once the feature is implemented
-                    },
-                  ),
-                );
+              onTap: () {
+                // TODO: Navigate to order details
               },
             ),
+          );
+        },
+      ),
     );
   }
 

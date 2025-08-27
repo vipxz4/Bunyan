@@ -15,29 +15,22 @@ class ProfessionalSearchResultsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: const ScreenHeader(title: 'نتائج البحث: مقاولون'),
-      body: results.when(
-        data: (professionals) {
-          if (professionals.isEmpty) {
-            return const Center(child: Text('لا توجد نتائج مطابقة للبحث.'));
-          }
-          return ListView.separated(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: professionals.length,
-            itemBuilder: (context, index) {
-              final professional = professionals[index];
-              return ProfessionalCard(
-                professional: professional,
-                onTap: () {
-                  context.push('/home/professional-profile/${professional.id}');
-                },
-              );
-            },
-            separatorBuilder: (context, index) => const SizedBox(height: 12),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('حدث خطأ أثناء تحميل النتائج.')),
-      ),
+      body: results.isEmpty
+          ? const Center(child: Text('لا توجد نتائج مطابقة للبحث.'))
+          : ListView.separated(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: results.length,
+              itemBuilder: (context, index) {
+                final professional = results[index];
+                return ProfessionalCard(
+                  professional: professional,
+                  onTap: () {
+                    context.push('/home/professional-profile/${professional.id}');
+                  },
+                );
+              },
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+            ),
     );
   }
 }

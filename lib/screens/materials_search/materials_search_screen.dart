@@ -104,23 +104,19 @@ class MaterialsSearchScreen extends ConsumerWidget {
               onViewAll: () {},
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
             ),
-            featuredProducts.when(
-              data: (products) => HorizontalCardCarousel(
-                height: 320,
-                itemCount: products.length,
-                itemBuilder: (context, index) {
-                  final product = products[index];
-                  return SizedBox(
-                    width: 200,
-                    child: ProductCard(
-                      product: product,
-                      onTap: () => context.push('/home/product-details/${product.id}'),
-                    ),
-                  );
-                },
-              ),
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('حدث خطأ أثناء تحميل المنتجات')),
+            HorizontalCardCarousel(
+              height: 320,
+              itemCount: featuredProducts.length,
+              itemBuilder: (context, index) {
+                final product = featuredProducts[index];
+                return SizedBox(
+                  width: 200,
+                  child: ProductCard(
+                    product: product,
+                    onTap: () => context.push('/home/product-details/${product.id}'),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 24),
             Padding(

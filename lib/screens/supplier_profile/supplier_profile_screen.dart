@@ -16,11 +16,9 @@ class SupplierProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final supplierAsync = ref.watch(supplierDetailsProvider(id));
-    final allProductsAsync = ref.watch(productsProvider);
-    final supplierProducts = allProductsAsync.maybeWhen(
-      data: (products) => products.where((p) => p.supplierId == id).toList().cast<ProductModel>(),
-      orElse: () => <ProductModel>[],
-    );
+    final allProducts = ref.watch(productsProvider);
+    final supplierProducts =
+        allProducts.where((p) => p.supplierId == id).toList();
 
     return supplierAsync.when(
           data: (supplier) {

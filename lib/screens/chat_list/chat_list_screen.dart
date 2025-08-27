@@ -15,21 +15,17 @@ class ChatListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final chatThreadsAsync = ref.watch(chatThreadsProvider);
+    final chatThreads = ref.watch(chatThreadsProvider);
     return Scaffold(
       appBar: const ScreenHeader(title: 'الرسائل'),
-      body: chatThreadsAsync.when(
-        data: (chatThreads) => ListView.separated(
-          itemCount: chatThreads.length,
-          itemBuilder: (context, index) {
-            final thread = chatThreads[index];
-            return _ChatThreadCard(thread: thread);
-          },
-          separatorBuilder: (context, index) =>
-              const Divider(height: 1, indent: 80),
-        ),
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('حدث خطأ: $err')),
+      body: ListView.separated(
+        itemCount: chatThreads.length,
+        itemBuilder: (context, index) {
+          final thread = chatThreads[index];
+          return _ChatThreadCard(thread: thread);
+        },
+        separatorBuilder: (context, index) =>
+            const Divider(height: 1, indent: 80),
       ),
     );
   }
