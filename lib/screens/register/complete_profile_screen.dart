@@ -60,6 +60,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
         address: _addressController.text.isNotEmpty ? _addressController.text : user.address,
         specialization: _specializationController.text.isNotEmpty ? _specializationController.text : user.specialization,
         yearsOfExperience: _experienceController.text.isNotEmpty ? int.tryParse(_experienceController.text) : user.yearsOfExperience,
+        isProfileComplete: true, // Mark profile as complete
       );
 
       await ref.read(userActionsProvider).updateUser(updatedUser);

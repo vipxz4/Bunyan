@@ -64,6 +64,7 @@ class AuthService {
         'address': null,
         'specialization': null,
         'yearsOfExperience': null,
+        'isProfileComplete': false, // Set to false on creation
       });
     } on FirebaseException catch (e) {
       // In a real app, handle this error more gracefully

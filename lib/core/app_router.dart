@@ -42,6 +42,7 @@ import 'package:bonyan/screens/forgot_password/forgot_password_screen.dart';
 import 'package:bonyan/screens/splash/splash_screen.dart';
 import 'package:bonyan/screens/supplier_profile/supplier_profile_screen.dart';
 import 'package:bonyan/services/auth_service.dart';
+import 'package:bonyan/providers/data_providers.dart';
 import 'package:bonyan/widgets/navigation/scaffold_with_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -58,39 +59,54 @@ final _shellNavigatorKeyForAccount =
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authStateChangesProvider);
+  // Also watch userDetailsProvider to make decisions based on profile state.
+  final userDetails = ref.watch(userDetailsProvider);
 
   return GoRouter(
     initialLocation: '/splash',
     navigatorKey: _rootNavigatorKey,
     redirect: (context, state) {
       final isLoggedIn = authState.value != null;
-      final location = state.uri.path; // Use .path to ignore query params
+      final location = state.uri.path;
 
-      // Routes that are part of the authentication flow.
+      // Define which routes are part of the authentication flow
       final isAuthFlowRoute = location == '/login' ||
           location == '/register' ||
           location == '/forgot-password' ||
           location == '/complete-profile';
 
-      // Routes that can be accessed without being logged in.
+      // Define routes that are publicly accessible
       final isPublicRoute =
           isAuthFlowRoute || location == '/splash' || location == '/onboarding';
 
-      // If user is not logged in and not on a public route, send to login.
+      // If user is not logged in and not on a public route, redirect to login
       if (!isLoggedIn && !isPublicRoute) {
         return '/login';
       }
 
-      // If user IS logged in and tries to access pre-auth routes, send to home.
-      final isPreAuthRoute = location == '/login' ||
-          location == '/register' ||
-          location == '/forgot-password';
+      // If user is logged in, perform additional checks
+      if (isLoggedIn) {
+        // While user details are loading, don't redirect anywhere.
+        if (userDetails.isLoading) {
+          return null;
+        }
 
-      if (isLoggedIn && isPreAuthRoute) {
-        return '/home';
+        final user = userDetails.asData?.value;
+        final isProfileComplete = user?.isProfileComplete ?? false;
+
+        // If profile is not complete, redirect to the complete-profile screen
+        if (!isProfileComplete && location != '/complete-profile') {
+          return '/complete-profile';
+        }
+
+        // If profile IS complete, but user is trying to access auth flow routes,
+        // redirect them to the home screen.
+        if (isProfileComplete && isAuthFlowRoute) {
+          return '/home';
+        }
       }
 
-      return null; // No redirect needed.
+      return null; // No redirect needed
     },
     routes: [
       GoRoute(

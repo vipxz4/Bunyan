@@ -20,6 +20,9 @@ class UserModel {
   final String? specialization;
   final int? yearsOfExperience;
 
+  // Metadata
+  final bool isProfileComplete;
+
   const UserModel({
     required this.id,
     required this.fullName,
@@ -32,6 +35,7 @@ class UserModel {
     this.address,
     this.specialization,
     this.yearsOfExperience,
+    this.isProfileComplete = false,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json, String id) {
@@ -48,6 +52,7 @@ class UserModel {
       address: json['address'],
       specialization: json['specialization'],
       yearsOfExperience: json['yearsOfExperience'],
+      isProfileComplete: json['isProfileComplete'] ?? false,
     );
   }
 
@@ -63,6 +68,7 @@ class UserModel {
       'address': address,
       'specialization': specialization,
       'yearsOfExperience': yearsOfExperience,
+      'isProfileComplete': isProfileComplete,
     };
   }
 
@@ -78,6 +84,7 @@ class UserModel {
     String? address,
     String? specialization,
     int? yearsOfExperience,
+    bool? isProfileComplete,
   }) {
     return UserModel(
       id: id ?? this.id,
@@ -92,6 +99,7 @@ class UserModel {
       address: address ?? this.address,
       specialization: specialization ?? this.specialization,
       yearsOfExperience: yearsOfExperience ?? this.yearsOfExperience,
+      isProfileComplete: isProfileComplete ?? this.isProfileComplete,
     );
   }
 }
