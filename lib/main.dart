@@ -3,10 +3,17 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bonyan/core/app_router.dart';
 import 'package:bonyan/core/app_theme.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:bonyan/firebase_options.dart';
 
-void main() {
+void main() async {
   // Ensure that widget binding is initialized before running the app.
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     // ProviderScope is what makes Riverpod work.
@@ -21,6 +28,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final goRouter = ref.watch(goRouterProvider);
     // We use MaterialApp.router to integrate with go_router.
     return MaterialApp.router(
       title: 'بنيان',

@@ -39,8 +39,10 @@ import 'package:bonyan/screens/guarantee_funding/guarantee_funding_screen.dart';
 import 'package:bonyan/screens/forgot_password/forgot_password_screen.dart';
 import 'package:bonyan/screens/splash/splash_screen.dart';
 import 'package:bonyan/screens/supplier_profile/supplier_profile_screen.dart';
+import 'package:bonyan/services/auth_service.dart';
 import 'package:bonyan/widgets/navigation/scaffold_with_nav_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 // Private navigators
@@ -52,10 +54,32 @@ final _shellNavigatorKeyForHome =
 final _shellNavigatorKeyForAccount =
     GlobalKey<NavigatorState>(debugLabel: 'shellAccount');
 
-final goRouter = GoRouter(
-  initialLocation: '/splash',
-  navigatorKey: _rootNavigatorKey,
-  routes: [
+final goRouterProvider = Provider<GoRouter>((ref) {
+  final authState = ref.watch(authStateChangesProvider);
+
+  return GoRouter(
+    initialLocation: '/splash',
+    navigatorKey: _rootNavigatorKey,
+    redirect: (context, state) {
+      // If the user is not logged in, they can only access the auth pages.
+      final isLoggedIn = authState.value != null;
+      final location = state.uri.toString();
+      final isAuthRoute = location == '/login' ||
+          location == '/register' ||
+          location == '/forgot-password';
+      final isPublicRoute =
+          isAuthRoute || location == '/splash' || location == '/onboarding';
+
+      if (!isLoggedIn && !isPublicRoute) {
+        return '/login';
+      }
+      if (isLoggedIn && isAuthRoute) {
+        return '/home';
+      }
+
+      return null; // No redirect needed.
+    },
+    routes: [
     GoRoute(
       path: '/splash',
       builder: (context, state) => const SplashScreen(),

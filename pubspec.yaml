@@ -29,6 +29,7 @@ dependencies:
   timeago: ^3.6.1
   collection: ^1.18.0
   firebase_core: ^4.0.0
+  firebase_auth: ^5.0.0
   lucide_icons: ^0.257.0
   google_fonts: ^6.3.0
 
