@@ -16,6 +16,7 @@ class RegisterScreen extends ConsumerStatefulWidget {
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -25,6 +26,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -34,10 +36,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (_formKey.currentState!.validate() && !_isLoading) {
       setState(() => _isLoading = true);
       try {
-        await ref.read(authServiceProvider).signUpWithEmailAndPassword(
-              _emailController.text,
-              _passwordController.text,
-            );
+        final userCredential =
+            await ref.read(authServiceProvider).signUpWithEmailAndPassword(
+                  _emailController.text,
+                  _passwordController.text,
+                );
+
+        if (userCredential.user != null) {
+          await ref.read(authServiceProvider).createUserDocument(
+                uid: userCredential.user!.uid,
+                fullName: _nameController.text,
+                email: _emailController.text,
+                role: _selectedRole ?? 'عميل', // Default role
+              );
+        }
         // On success, the auth state listener in the router should handle navigation.
       } catch (e) {
         if (mounted) {
@@ -64,10 +76,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           key: _formKey,
           child: Column(
             children: [
-              const CustomTextField(
+              CustomTextField(
+                controller: _nameController,
                 labelText: 'الاسم الكامل',
                 hintText: 'ادخل اسمك الكامل',
                 prefixIcon: LucideIcons.user,
+                validator: (value) =>
+                    value!.isEmpty ? 'الرجاء إدخال الاسم الكامل' : null,
               ),
               const SizedBox(height: 20),
               CustomTextField(
