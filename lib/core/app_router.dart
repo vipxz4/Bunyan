@@ -21,8 +21,11 @@ import 'package:bonyan/screens/favorites/favorites_screen.dart';
 import 'package:bonyan/screens/notification_details/notification_details_screen.dart';
 import 'package:bonyan/screens/notifications/notifications_screen.dart';
 import 'package:bonyan/screens/purchase_orders/purchase_orders_screen.dart';
+import 'package:bonyan/screens/my_ratings/my_ratings_screen.dart';
 import 'package:bonyan/screens/quotation_requests/quotation_requests_screen.dart';
 import 'package:bonyan/screens/saved_contracts/saved_contracts_screen.dart';
+import 'package:bonyan/screens/help_and_support/help_and_support_screen.dart';
+import 'package:bonyan/screens/settings/settings_screen.dart';
 import 'package:bonyan/screens/forgot_password/forgot_password_screen.dart';
 import 'package:bonyan/screens/splash/splash_screen.dart';
 import 'package:bonyan/screens/supplier_profile/supplier_profile_screen.dart';
@@ -219,6 +222,21 @@ final goRouter = GoRouter(
                   path: 'saved-contracts',
                   name: 'saved-contracts',
                   builder: (context, state) => const SavedContractsScreen(),
+                ),
+                GoRoute(
+                  path: 'my-ratings',
+                  name: 'my-ratings',
+                  builder: (context, state) => const MyRatingsScreen(),
+                ),
+                GoRoute(
+                  path: 'settings',
+                  name: 'settings',
+                  builder: (context, state) => const SettingsScreen(),
+                ),
+                GoRoute(
+                  path: 'help-and-support',
+                  name: 'help-and-support',
+                  builder: (context, state) => const HelpAndSupportScreen(),
                 ),
               ],
             ),

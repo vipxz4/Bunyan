@@ -46,18 +46,18 @@ class AccountScreen extends ConsumerWidget {
                     _AccountMenuItem(
                         icon: LucideIcons.star,
                         text: 'تقييماتي',
-                        onTap: () => context.push('/account/coming-soon')),
+                        onTap: () => context.push('/account/my-ratings')),
                   ]),
                   const SizedBox(height: 16),
                   _buildMenuSection([
                     _AccountMenuItem(
                         icon: LucideIcons.settings,
                         text: 'الإعدادات',
-                        onTap: () => context.push('/account/coming-soon')),
+                        onTap: () => context.push('/account/settings')),
                     _AccountMenuItem(
                         icon: LucideIcons.helpCircle,
                         text: 'المساعدة والدعم',
-                        onTap: () => context.push('/account/coming-soon')),
+                        onTap: () => context.push('/account/help-and-support')),
                   ]),
                   const SizedBox(height: 16),
                   _buildMenuSection([
