@@ -65,12 +65,13 @@ class AccountScreen extends ConsumerWidget {
                         icon: LucideIcons.briefcase,
                         text: 'لوحة تحكم مقدم الخدمة',
                         color: Colors.green.shade700,
-                        onTap: () => context.push('/account/coming-soon')),
+                        onTap: () =>
+                            context.push('/account/service-provider-dashboard')),
                     _AccountMenuItem(
                         icon: LucideIcons.store,
                         text: 'لوحة تحكم المورد',
                         color: Colors.blue.shade700,
-                        onTap: () => context.push('/account/coming-soon')),
+                        onTap: () => context.push('/account/supplier-dashboard')),
                   ]),
                   const SizedBox(height: 16),
                   SizedBox(

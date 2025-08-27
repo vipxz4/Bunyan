@@ -13,7 +13,30 @@ final allMyProjectsProvider =
     Provider<List<ProjectModel>>((ref) => mockAllMyProjects);
 final recommendedProfessionalsProvider =
     Provider<List<ProfessionalModel>>((ref) => mockRecommendedProfessionals);
-final productsProvider = Provider<List<ProductModel>>((ref) => mockProducts);
+
+class ProductsNotifier extends StateNotifier<List<ProductModel>> {
+  ProductsNotifier() : super(mockProducts);
+
+  void addProduct(ProductModel product) {
+    state = [...state, product];
+  }
+
+  void editProduct(ProductModel updatedProduct) {
+    state = [
+      for (final product in state)
+        if (product.id == updatedProduct.id) updatedProduct else product,
+    ];
+  }
+
+  void deleteProduct(String productId) {
+    state = state.where((product) => product.id != productId).toList();
+  }
+}
+
+final productsProvider =
+    StateNotifierProvider<ProductsNotifier, List<ProductModel>>(
+        (ref) => ProductsNotifier());
+
 final notificationsProvider =
     Provider<List<NotificationModel>>((ref) => mockNotifications);
 final chatThreadsProvider =

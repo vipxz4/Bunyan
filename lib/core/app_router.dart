@@ -26,6 +26,13 @@ import 'package:bonyan/screens/quotation_requests/quotation_requests_screen.dart
 import 'package:bonyan/screens/saved_contracts/saved_contracts_screen.dart';
 import 'package:bonyan/screens/help_and_support/help_and_support_screen.dart';
 import 'package:bonyan/screens/settings/settings_screen.dart';
+import 'package:bonyan/screens/supplier_dashboard/supplier_dashboard_screen.dart';
+import 'package:bonyan/screens/supplier_dashboard/my_products_screen.dart';
+import 'package:bonyan/screens/supplier_dashboard/my_orders_screen.dart';
+import 'package:bonyan/screens/supplier_dashboard/add_edit_product_screen.dart';
+import 'package:bonyan/screens/service_provider_dashboard/service_provider_dashboard_screen.dart';
+import 'package:bonyan/screens/service_provider_dashboard/sp_my_projects_screen.dart';
+import 'package:bonyan/screens/service_provider_dashboard/sp_my_bids_screen.dart';
 import 'package:bonyan/screens/forgot_password/forgot_password_screen.dart';
 import 'package:bonyan/screens/splash/splash_screen.dart';
 import 'package:bonyan/screens/supplier_profile/supplier_profile_screen.dart';
@@ -238,6 +245,52 @@ final goRouter = GoRouter(
                   name: 'help-and-support',
                   builder: (context, state) => const HelpAndSupportScreen(),
                 ),
+                GoRoute(
+                    path: 'supplier-dashboard',
+                    name: 'supplier-dashboard',
+                    builder: (context, state) => const SupplierDashboardScreen(),
+                    routes: [
+                      GoRoute(
+                          path: 'my-products',
+                          name: 'my-products',
+                          builder: (context, state) => const MyProductsScreen(),
+                          routes: [
+                            GoRoute(
+                              path: 'add',
+                              name: 'add-product',
+                              builder: (context, state) =>
+                                  const AddEditProductScreen(),
+                            ),
+                            GoRoute(
+                              path: 'edit/:id',
+                              name: 'edit-product',
+                              builder: (context, state) => AddEditProductScreen(
+                                  productId: state.pathParameters['id']!),
+                            ),
+                          ]),
+                      GoRoute(
+                        path: 'my-orders',
+                        name: 'my-orders',
+                        builder: (context, state) => const MyOrdersScreen(),
+                      ),
+                    ]),
+                GoRoute(
+                    path: 'service-provider-dashboard',
+                    name: 'service-provider-dashboard',
+                    builder: (context, state) =>
+                        const ServiceProviderDashboardScreen(),
+                    routes: [
+                      GoRoute(
+                        path: 'my-projects',
+                        name: 'sp-my-projects',
+                        builder: (context, state) => const SpMyProjectsScreen(),
+                      ),
+                      GoRoute(
+                        path: 'my-bids',
+                        name: 'sp-my-bids',
+                        builder: (context, state) => const SpMyBidsScreen(),
+                      ),
+                    ]),
               ],
             ),
           ],

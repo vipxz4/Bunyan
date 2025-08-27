@@ -55,6 +55,7 @@ final List<ProductModel> mockProducts = [
     supplierId: 'sup-nahda',
     supplierName: 'مؤسسة النهضة للمقاولات',
     description: 'إسمنت مقاوم عالي الجودة للأعمال الخرسانية.',
+    stock: 500,
   ),
   ProductModel(
     id: 'prod-red-brick',
@@ -65,6 +66,7 @@ final List<ProductModel> mockProducts = [
     supplierId: 'sup-nahda',
     supplierName: 'مؤسسة النهضة للمقاولات',
     description: 'طوب أحمر عالي الجودة للبناء.',
+    stock: 10000,
   ),
   ProductModel(
     id: 'prod-concrete-block',
@@ -75,6 +77,7 @@ final List<ProductModel> mockProducts = [
     supplierId: 'sup-nahda',
     supplierName: 'مؤسسة النهضة للمقاولات',
     description: 'بلك أسمنتي مصمت عالي الجودة مقاس 20x20x40 سم. مثالي لأعمال البناء والجدران الحاملة.',
+    stock: 8000,
   ),
 ];
 
