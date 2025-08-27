@@ -1,6 +1,7 @@
 import 'package:bonyan/services/auth_service.dart';
 import 'package:bonyan/models/user_model.dart';
 import 'package:bonyan/providers/data_providers.dart';
+import 'package:bonyan/utils/validators.dart';
 import 'package:flutter/material.dart';
 import 'package.flutter_riverpod/flutter_riverpod.dart';
 import 'package:bonyan/widgets/widgets.dart';
@@ -143,8 +144,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
             hintText: 'ادخل رقم هاتفك',
             keyboardType: TextInputType.phone,
             prefixIcon: LucideIcons.phone,
-            validator: (value) =>
-                value!.isEmpty ? 'الرجاء إدخال رقم الهاتف' : null,
+            validator: Validators.validateYemeniPhoneNumber,
           ),
         );
         break;
@@ -156,7 +156,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
             hintText: 'ادخل اسم شركتك',
             prefixIcon: LucideIcons.building,
             validator: (value) =>
-                value!.isEmpty ? 'الرجاء إدخال اسم الشركة' : null,
+                Validators.validateNotEmpty(value, 'اسم الشركة'),
           ),
           const SizedBox(height: 20),
           CustomTextField(
@@ -164,8 +164,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
             labelText: 'العنوان',
             hintText: 'ادخل عنوان عملك',
             prefixIcon: LucideIcons.mapPin,
-            validator: (value) =>
-                value!.isEmpty ? 'الرجاء إدخال العنوان' : null,
+            validator: (value) => Validators.validateNotEmpty(value, 'العنوان'),
           ),
         ]);
         break;
@@ -176,8 +175,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
             labelText: 'التخصص',
             hintText: 'مثال: سباك، كهربائي',
             prefixIcon: LucideIcons.wrench,
-            validator: (value) =>
-                value!.isEmpty ? 'الرجاء إدخال التخصص' : null,
+            validator: (value) => Validators.validateNotEmpty(value, 'التخصص'),
           ),
           const SizedBox(height: 20),
           CustomTextField(
@@ -187,7 +185,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
             keyboardType: TextInputType.number,
             prefixIcon: LucideIcons.award,
             validator: (value) =>
-                value!.isEmpty ? 'الرجاء إدخال سنوات الخبرة' : null,
+                Validators.validateNotEmpty(value, 'سنوات الخبرة'),
           ),
         ]);
         break;

@@ -2,6 +2,7 @@ import 'package:bonyan/core/app_theme.dart';
 import 'package:bonyan/services/auth_service.dart';
 import 'package:bonyan/utils/error_handler.dart';
 import 'package:bonyan/utils/snackbar_helper.dart';
+import 'package:bonyan/utils/validators.dart';
 import 'package:bonyan/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -78,8 +79,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   hintText: 'example@email.com',
                   keyboardType: TextInputType.emailAddress,
                   prefixIcon: LucideIcons.mail,
-                  validator: (value) =>
-                      value!.isEmpty ? 'الرجاء إدخال البريد الإلكتروني' : null,
+                  validator: Validators.validateEmail,
                 ),
                 const SizedBox(height: 20),
                 CustomTextField(
@@ -89,7 +89,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   isPassword: true,
                   prefixIcon: LucideIcons.lock,
                   validator: (value) =>
-                      value!.isEmpty ? 'الرجاء إدخال كلمة المرور' : null,
+                      Validators.validateNotEmpty(value, 'كلمة المرور'),
                 ),
               Align(
                 alignment: AlignmentDirectional.centerStart,
