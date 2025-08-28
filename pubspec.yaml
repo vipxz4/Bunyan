@@ -31,10 +31,10 @@ dependencies:
   collection: ^1.19.1
 
   # Firebase
-  firebase_core: 
-  firebase_auth: 
-  cloud_firestore: 
-  firebase_storage:  # For file uploads
+  firebase_core: ^4.0.0
+  firebase_auth: ^6.0.1
+  cloud_firestore: ^6.0.0
+  firebase_storage: ^13.0.0 # For file uploads
 
   # Image Picker
   image_picker: ^1.1.2 # For picking images from gallery
