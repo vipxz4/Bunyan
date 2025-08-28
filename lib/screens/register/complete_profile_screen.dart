@@ -1,15 +1,13 @@
-import 'package:bonyan/services/auth_service.dart';
-import 'package:bonyan/services/storage_service.dart';
 import 'package:bonyan/models/user_model.dart';
 import 'package:bonyan/providers/data_providers.dart';
-import 'dart:io';
 import 'package:bonyan/utils/validators.dart';
+import 'package:bonyan/utils/snackbar_helper.dart';
 import 'package:flutter/material.dart';
-import 'package.flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bonyan/widgets/widgets.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CompleteProfileScreen extends ConsumerStatefulWidget {
   final String role;
@@ -24,7 +22,6 @@ class CompleteProfileScreen extends ConsumerStatefulWidget {
 class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  File? _imageFile;
 
   // Controllers for all potential fields
   final _phoneController = TextEditingController();
@@ -49,39 +46,14 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-    }
-  }
-
-  Future<void> _submit() async {
+  Future<void> _submit(UserModel currentUser) async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
     setState(() => _isLoading = true);
 
-    final user = ref.read(userDetailsProvider).asData?.value;
-    if (user == null) {
-      showErrorSnackBar(context, 'حدث خطأ غير متوقع: لم يتم العثور على المستخدم.');
-      setState(() => _isLoading = false);
-      return;
-    }
-
     try {
-      String? avatarUrl;
-      if (_imageFile != null) {
-        avatarUrl = await ref
-            .read(storageServiceProvider)
-            .uploadProfilePicture(uid: user.id, file: _imageFile!);
-      }
-
-      final updatedUser = user.copyWith(
+      final updatedUser = currentUser.copyWith(
         phoneNumber: _phoneController.text,
         address: _addressController.text,
         companyName: _companyNameController.text,
@@ -91,7 +63,6 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
         certifications: _certificationsController.text,
         portfolio: _portfolioController.text,
         isProfileComplete: true,
-        avatarUrl: avatarUrl, // This will be null if no image is picked/uploaded
       );
 
       await ref.read(userActionsProvider).updateUser(updatedUser);
@@ -148,13 +119,13 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
-                  _buildImagePicker(),
+                  _buildImageDisplay(user.avatarUrl),
                   const SizedBox(height: 24),
                   ..._buildFormFields(widget.role),
                   const SizedBox(height: 24),
                   PrimaryButton(
                     text: 'حفظ ومتابعة',
-                    onPressed: _submit,
+                    onPressed: () => _submit(user),
                     isLoading: _isLoading,
                   ),
                 ],
@@ -166,31 +137,16 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
     );
   }
 
-  Widget _buildImagePicker() {
+  Widget _buildImageDisplay(String? avatarUrl) {
     return Center(
-      child: Stack(
-        children: [
-          CircleAvatar(
-            radius: 60,
-            backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-            backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
-            child: _imageFile == null
-                ? const Icon(LucideIcons.user, size: 50, color: Colors.grey)
-                : null,
-          ),
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: IconButton(
-              icon: const Icon(LucideIcons.camera),
-              onPressed: _pickImage,
-              style: IconButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                foregroundColor: Theme.of(context).colorScheme.onPrimary,
-              ),
-            ),
-          ),
-        ],
+      child: CircleAvatar(
+        radius: 60,
+        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        backgroundImage:
+            avatarUrl != null ? CachedNetworkImageProvider(avatarUrl) : null,
+        child: avatarUrl == null
+            ? const Icon(LucideIcons.user, size: 50, color: Colors.grey)
+            : null,
       ),
     );
   }
