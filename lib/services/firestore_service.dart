@@ -57,7 +57,7 @@ class FirestoreService {
     required String path,
     required T Function(Map<String, dynamic>? data, String documentID) builder,
   }) {
-    final reference = _firestore.doc(path);
+    final reference = _collection.doc(path);
     final snapshots = reference.snapshots();
     return snapshots.map((snapshot) {
       // Explicitly handle the case where the document does not exist.
@@ -109,7 +109,7 @@ class FirestoreService {
     required T Function(Map<String, dynamic>? data, String documentID) builder,
   }) async {
     try {
-      final reference = _firestore.doc(path);
+      final reference = _collection.doc(path);
       final snapshot = await reference.get();
       return builder(snapshot.data(), snapshot.id);
     } on FirebaseException catch (e) {
